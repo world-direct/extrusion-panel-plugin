@@ -1,22 +1,26 @@
-# Simple React Panel
+# Extrusion panel
 
-This is just a stub to show how to create a basic visualization plugin
+The Extrusion panel plugin allows to extrude geometries provided as [GeoJSON](https://tools.ietf.org/html/rfc7946).
 
+## Build
 
-To work with this plugin run:
+### Development build
+
+To build the plugin for the use in the development:
 ```
 yarn dev
 ```
+This will run linting tools and apply prettier fix.
 
-or
+
+In addition you can use the following to get an index.html which can be used for stand-alone testing:
 ```
 yarn watch
 ```
 
-This will run linting tools and apply prettier fix.
+### Production build
 
-
-To build the plugin run:
+To build the plugin for the use in production:
 ```
 yarn build
 ```
