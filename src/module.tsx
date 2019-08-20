@@ -1,10 +1,6 @@
-import React, { PureComponent } from 'react';
-import { PanelProps, PanelPlugin } from '@grafana/ui';
+import { PanelPlugin } from '@grafana/ui';
+import { defaults } from './types';
+import { ExtrusionPanel } from './ExtrusionPanel';
+import { ExtrusionPanelEditor } from './ExtrusionPanelEditor';
 
-export class MyPanel extends PureComponent<PanelProps> {
-  render() {
-    return <div>Hello from my panel</div>;
-  }
-}
-
-export const plugin = new PanelPlugin(MyPanel);
+export const plugin = new PanelPlugin(ExtrusionPanel).setDefaults(defaults).setEditor(ExtrusionPanelEditor);

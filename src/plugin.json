@@ -1,12 +1,12 @@
 {
   "type": "panel",
-  "name": "Simple Panel",
-  "id": "myorgid-simple-panel",
+  "name": "Extrusion panel",
+  "id": "extrusion-panel",
 
   "info": {
-    "description": "Simple React Panel",
+    "description": "Extrusion panel",
     "author": {
-      "name": "Your Name"
+      "name": "Grafana Labs, Simon Pfeifhofer"
     },
     "keywords": ["Simple"],
     "logos": {
@@ -14,8 +14,8 @@
       "large": "img/logo.svg"
     },
     "links": [
-      {"name": "Website", "url": "https://github.com/grafana/simple-react-panel"},
-      {"name": "License", "url": "https://github.com/grafana/simple-react-panel/blob/master/LICENSE"}
+      {"name": "Website", "url": "https://github.com/world-direct/extrusion-panel-plugin"},
+      {"name": "License", "url": "https://www.apache.org/licenses/LICENSE-2.0"}
     ],
     "screenshots": [],
     "version": "%VERSION%",
