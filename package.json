@@ -1,18 +1,24 @@
 {
-  "name": "simple-react-panel",
+  "name": "extrusion-panel",
   "version": "1.0.0",
-  "description": "Grafana RSS Panel",
+  "description": "Extrusion panel",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
-  "author": "Grafana Labs",
+  "author": "Simon Pfeifhofer",
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/data": "latest",
     "@grafana/toolkit": "next",
-    "@grafana/ui": "latest"
+    "@grafana/ui": "latest",
+    "react-mapbox-gl": "4.6.0",
+    "mapbox-gl": "1.2.1"
+  },
+  "dependencies": {
+    "react-mapbox-gl": "4.6.0",
+    "mapbox-gl": "1.2.1"
   }
 }
