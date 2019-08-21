@@ -95,7 +95,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       'fill-extrusion-base': ['get', 'base_height'],
 
       // Make extrusions slightly opaque for see through indoor walls.
-      'fill-extrusion-opacity': 0.6,
+      'fill-extrusion-opacity': 0.5,
     };
 
     return (
