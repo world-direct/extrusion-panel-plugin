@@ -1,72 +1,72 @@
 import React, { PureComponent } from 'react';
+import Dropdown, { Option } from 'react-dropdown';
+import 'react-dropdown/style.css';
 import { PanelProps } from '@grafana/ui';
 import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
-import { Options, GeoJsonDataState } from './types';
+import { Options, GeoJsonDataState, Metric } from './types';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
+  private staticMetricOptions: Option[];
+  private onMetricChange: (selectedOption: Option) => void;
+
   constructor(props: any) {
     super(props);
+
+    this.staticMetricOptions = this.getMetricOptions();
+
+    this.onMetricChange = this.onMetricChangeFunction.bind(this);
 
     this.state = {
       isLoading: false,
       geoJson: {},
       viewOptions: {},
+      metric: Metric.ParticulateMatter as Metric,
     };
   }
 
-  reload(apiUri: string) {
+  getMetricOptions(): Option[] {
+    const options = new Array<Option>();
+    for (const metric in Metric) {
+      options.push({ label: Metric[metric], value: metric });
+    }
+    return options;
+  }
+
+  onMetricChangeFunction(selectedOption: Option) {
+    const tmpMetric = selectedOption.value as Metric;
+    this.setState({ metric: tmpMetric });
+    this.reload(this.props.options.apiUri, tmpMetric);
+  }
+
+  reload(apiUri: string, metric: Metric) {
     this.setState({ isLoading: true });
-    fetch(apiUri)
+    fetch(
+      apiUri.concat(
+        '?metric=' +
+          encodeURIComponent(metric) +
+          '&fromUTC=' +
+          encodeURIComponent(this.props.timeRange.from.unix()) +
+          '&toUTC=' +
+          encodeURIComponent(this.props.timeRange.to.unix())
+      )
+    )
       .then(response => response.json())
       .then(data => this.setState({ isLoading: false, geoJson: data.geoJson, viewOptions: data.viewOptions }));
-
-    // const data =
-    // {
-    //   "viewOptions":{
-    //       "center":[11.3863734397508, 47.2639689998285],
-    //       "zoom":[15.99],
-    //       "bearing":[20],
-    //       "pitch":[40]
-    //   },
-    //   "geoJson": {
-    //     "type": "FeatureCollection",
-    //     "features": [
-    //       {
-    //         "type": "Feature",
-    //         "properties": {
-    //           "level": 1,
-    //           "name": "Location-Test",
-    //           "height": 200,
-    //           "base_height": 0,
-    //           "color": "red"
-    //         },
-    //         "geometry": {
-    //           "type": "Polygon",
-    //           "coordinates": [
-    //             [
-    //               [11.3863734397508, 47.2639689998285],
-    //               [11.386572, 47.2638342527074],
-    //               [11.3867705602492, 47.2639689998285],
-    //               [11.386572, 47.2641037472926],
-    //               [11.3863734397508, 47.2639689998285]
-    //             ]
-    //           ]
-    //         }
-    //       }
-    //     ]
-    //   }
-    // };
   }
 
   componentWillReceiveProps(newProps: PanelProps<Options>) {
-    if (this.props.options.apiUri !== newProps.options.apiUri) {
-      this.reload(newProps.options.apiUri);
+    if (
+      this.props.options.apiUri !== newProps.options.apiUri ||
+      this.props.timeRange.from.unix() !== newProps.timeRange.from.unix() ||
+      this.props.timeRange.to.unix() !== newProps.timeRange.to.unix()
+    ) {
+      this.reload(newProps.options.apiUri, this.state.metric);
     }
   }
 
   componentDidMount() {
-    this.reload(this.props.options.apiUri);
+    this.reload(this.props.options.apiUri, this.state.metric);
   }
 
   render() {
@@ -98,22 +98,31 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       'fill-extrusion-opacity': 0.5,
     };
 
+    const options = this.staticMetricOptions;
+
     return (
-      <Map
-        style="mapbox://styles/mapbox/streets-v11"
-        center={viewOptions.center}
-        zoom={viewOptions.zoom}
-        pitch={viewOptions.pitch}
-        bearing={viewOptions.bearing}
-        containerStyle={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          width: '100%',
-        }}
-      >
-        <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
-      </Map>
+      <div>
+        <div>
+          <Dropdown options={options} value={this.state.metric} onChange={this.onMetricChange} />
+        </div>
+        <div>
+          <Map
+            style="mapbox://styles/mapbox/streets-v11"
+            center={viewOptions.center}
+            zoom={viewOptions.zoom}
+            pitch={viewOptions.pitch}
+            bearing={viewOptions.bearing}
+            containerStyle={{
+              position: 'absolute',
+              top: 50,
+              bottom: 0,
+              width: '100%',
+            }}
+          >
+            <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
+          </Map>
+        </div>
+      </div>
     );
   }
 }

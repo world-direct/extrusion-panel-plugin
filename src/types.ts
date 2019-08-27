@@ -5,10 +5,23 @@ export interface ViewOptions {
   pitch?: [number];
 }
 
+export enum Metric {
+  Temperature = 'Temperature',
+  Humidity = 'Humidity',
+  Pressure = 'Pressure',
+  ParticulateMatter = 'Particulate Matter',
+  CarbonMonoxide = 'Carbon Monoxide',
+  NitrogenDioxide = 'Nitrogen Dioxide',
+  SulfurDioxide = 'Sulfur Dioxide',
+  Ozone = 'Ozone',
+  NitricOxide = 'Nitric Oxide',
+}
+
 export interface GeoJsonDataState {
   isLoading: boolean;
   geoJson: object;
   viewOptions: ViewOptions;
+  metric: Metric;
 }
 
 export interface Options {
