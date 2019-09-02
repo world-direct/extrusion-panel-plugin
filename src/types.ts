@@ -27,9 +27,13 @@ export interface GeoJsonDataState {
 export interface Options {
   accessToken: string;
   apiUri: string;
+  apiUser: string;
+  apiPassword: string;
 }
 
 export const defaults: Options = {
-  accessToken: '<insert access token>', // 'pk.eyJ1Ijoic2ltb25wZmVpZmhvZmVyIiwiYSI6ImNqejlzZms5ODAyeXQzbW5wMTRicWJweDcifQ.rQSLUl9722_65grJjjTK4A'
-  apiUri: '<set api root-uri>', // http://www.mocky.io/v2/5d5a812e2f00002c0036f626
+  accessToken: '<insert access token>',
+  apiUri: '<set api root-uri>',
+  apiUser: '<set api user>',
+  apiPassword: '<set api password>',
 };

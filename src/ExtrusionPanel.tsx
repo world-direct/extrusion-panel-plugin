@@ -36,10 +36,10 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
   onMetricChangeFunction(selectedOption: Option) {
     const tmpMetric = selectedOption.value as Metric;
     this.setState({ metric: tmpMetric });
-    this.reload(this.props.options.apiUri, tmpMetric);
+    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, tmpMetric);
   }
 
-  reload(apiUri: string, metric: Metric) {
+  reload(apiUri: string, apiUser: string, apiPassword: string, metric: Metric) {
     this.setState({ isLoading: true });
     fetch(
       apiUri.concat(
@@ -49,7 +49,14 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
           encodeURIComponent(this.props.timeRange.from.unix()) +
           '&toUTC=' +
           encodeURIComponent(this.props.timeRange.to.unix())
-      )
+      ),
+      {
+        mode: 'cors',
+        headers: new Headers({
+          Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
+          'Content-Type': 'application/json',
+        }),
+      }
     )
       .then(response => response.json())
       .then(data => this.setState({ isLoading: false, geoJson: data.geoJson, viewOptions: data.viewOptions }));
@@ -57,16 +64,18 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
 
   componentWillReceiveProps(newProps: PanelProps<Options>) {
     if (
+      this.props.options.apiUser !== newProps.options.apiUser ||
+      this.props.options.apiPassword !== newProps.options.apiPassword ||
       this.props.options.apiUri !== newProps.options.apiUri ||
       this.props.timeRange.from.unix() !== newProps.timeRange.from.unix() ||
       this.props.timeRange.to.unix() !== newProps.timeRange.to.unix()
     ) {
-      this.reload(newProps.options.apiUri, this.state.metric);
+      this.reload(newProps.options.apiUri, newProps.options.apiUser, newProps.options.apiPassword, this.state.metric);
     }
   }
 
   componentDidMount() {
-    this.reload(this.props.options.apiUri, this.state.metric);
+    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, this.state.metric);
   }
 
   render() {
