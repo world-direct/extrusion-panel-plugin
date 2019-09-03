@@ -25,5 +25,3 @@ artifacts/
 work/
 ci/
 e2e-results/
-
-package-lock.json
