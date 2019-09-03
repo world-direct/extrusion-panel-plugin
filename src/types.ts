@@ -6,15 +6,14 @@ export interface ViewOptions {
 }
 
 export enum Metric {
+  ParticulateMatter10 = 'Particulate Matter 10',
+  ParticulateMatter25 = 'Particulate Matter 25',
+  NitrogenDioxide = 'Nitrogen Dioxide',
+  Ozone = 'Ozone',
+  SulfurDioxide = 'Sulfur Dioxide',
   Temperature = 'Temperature',
   Humidity = 'Humidity',
   Pressure = 'Pressure',
-  ParticulateMatter = 'Particulate Matter',
-  CarbonMonoxide = 'Carbon Monoxide',
-  NitrogenDioxide = 'Nitrogen Dioxide',
-  SulfurDioxide = 'Sulfur Dioxide',
-  Ozone = 'Ozone',
-  NitricOxide = 'Nitric Oxide',
 }
 
 export interface GeoJsonDataState {

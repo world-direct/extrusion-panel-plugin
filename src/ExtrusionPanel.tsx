@@ -21,7 +21,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       isLoading: false,
       geoJson: {},
       viewOptions: {},
-      metric: Metric.ParticulateMatter as Metric,
+      metric: Metric.ParticulateMatter10 as Metric,
     };
   }
 
