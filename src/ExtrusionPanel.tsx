@@ -71,15 +71,15 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       );
   }
 
-  componentWillReceiveProps(newProps: PanelProps<Options>) {
+  componentDidUpdate(prevProps: PanelProps<Options>) {
     if (
-      this.props.options.apiUser !== newProps.options.apiUser ||
-      this.props.options.apiPassword !== newProps.options.apiPassword ||
-      this.props.options.apiUri !== newProps.options.apiUri ||
-      this.props.timeRange.from.unix() !== newProps.timeRange.from.unix() ||
-      this.props.timeRange.to.unix() !== newProps.timeRange.to.unix()
+      this.props.options.apiUser !== prevProps.options.apiUser ||
+      this.props.options.apiPassword !== prevProps.options.apiPassword ||
+      this.props.options.apiUri !== prevProps.options.apiUri ||
+      this.props.timeRange.from.unix() !== prevProps.timeRange.from.unix() ||
+      this.props.timeRange.to.unix() !== prevProps.timeRange.to.unix()
     ) {
-      this.reload(newProps.options.apiUri, newProps.options.apiUser, newProps.options.apiPassword, this.state.metric);
+      this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, this.state.metric);
     }
   }
 
@@ -118,7 +118,11 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
 
     const options = this.staticMetricOptions;
 
-    const colorScheme = this.state.colorSchemes.find(c => c.metric === this.state.metric);
+    let colorScheme = undefined;
+
+    if (this.state.colorSchemes) {
+      colorScheme = this.state.colorSchemes.find(c => c.metric === this.state.metric);
+    }
 
     return (
       <div>
