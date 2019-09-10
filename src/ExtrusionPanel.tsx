@@ -140,6 +140,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
               position: 'absolute',
               top: 50,
               bottom: 0,
+              left: 0,
               width: '100%',
             }}
           >
