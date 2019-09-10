@@ -1,12 +1,11 @@
-import React, { PureComponent, CSSProperties } from 'react';
+import React, { PureComponent } from 'react';
 import Dropdown, { Option } from 'react-dropdown';
 import 'react-dropdown/style.css';
 import { PanelProps } from '@grafana/ui';
 import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
-import { Options, GeoJsonDataState, Metric, SelectionProps } from './types';
+import { Options, GeoJsonDataState, Metric } from './types';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { AbsoluteTimeRange } from '@grafana/data';
-import { classProperty } from '@babel/types';
+import { LegendBox } from 'LegendBox';
 
 export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
   private staticMetricOptions: Option[];
@@ -24,6 +23,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       geoJson: {},
       viewOptions: {},
       metric: Metric.ParticulateMatter10 as Metric,
+      colorSchemes: [],
     };
   }
 
@@ -36,7 +36,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
   }
 
   onMetricChangeFunction(selectedOption: Option) {
-    const tmpMetric = selectedOption.value as Metric;
+    const tmpMetric = (selectedOption.value as unknown) as Metric;
     this.setState({ metric: tmpMetric });
     this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, tmpMetric);
   }
@@ -46,11 +46,11 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
     fetch(
       apiUri.concat(
         '?metric=' +
-          encodeURIComponent(metric) +
+          encodeURIComponent((metric as unknown) as string) +
           '&fromUTC=' +
-          encodeURIComponent(this.props.timeRange.from.unix()) +
+          encodeURIComponent(this.props.timeRange.from.unix() + '') +
           '&toUTC=' +
-          encodeURIComponent(this.props.timeRange.to.unix())
+          encodeURIComponent(this.props.timeRange.to.unix() + '')
       ),
       {
         mode: 'cors',
@@ -61,7 +61,14 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
       }
     )
       .then(response => response.json())
-      .then(data => this.setState({ isLoading: false, geoJson: data.geoJson, viewOptions: data.viewOptions }));
+      .then(data =>
+        this.setState({
+          isLoading: false,
+          geoJson: data.geoJson,
+          viewOptions: data.viewOptions,
+          colorSchemes: data.colorScheme,
+        })
+      );
   }
 
   componentWillReceiveProps(newProps: PanelProps<Options>) {
@@ -111,18 +118,12 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
 
     const options = this.staticMetricOptions;
 
-    const legendStyle: CSSProperties = {
-      zIndex: 1,
-      position: 'absolute',
-      top: 50,
-      bottom: 0,
-      width: 200,
-    }
+    const colorScheme = this.state.colorSchemes.find(c => c.metric === this.state.metric);
 
     return (
       <div>
         <div>
-          <Dropdown options={options} value={this.state.metric} onChange={this.onMetricChange} />
+          <Dropdown options={options} value={(this.state.metric as unknown) as string} onChange={this.onMetricChange} />
         </div>
         <div>
           <Map
@@ -140,7 +141,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
           >
             <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
           </Map>
-          <div style={legendStyle}>Legend</div>
+          <LegendBox colorScheme={colorScheme} />
         </div>
       </div>
     );
