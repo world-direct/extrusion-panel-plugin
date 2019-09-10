@@ -34,20 +34,35 @@ export class LegendBox extends Component<Props, State> {
     show: true,
   };
 
-  renderColorRange(colorRange: ColorRange) {
+  // see https://stackoverflow.com/a/46151626
+  isTooDark(color: string) {
+    const r = parseInt(color.substr(1, 2), 16);
+    const g = parseInt(color.substr(3, 2), 16);
+    const b = parseInt(color.substr(4, 2), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq < 40;
+  }
+
+  renderColorRange = (colorRange: ColorRange): JSX.Element => {
+    const { isTooDark } = this;
+
+    const color = colorRange.color ? colorRange.color : '#fff';
+
     const colorStyle: CSSProperties = {
-      color: '#000',
-      backgroundColor: colorRange.color,
+      color: isTooDark(color) ? '#fff' : '#000',
+      backgroundColor: color,
       marginBottom: 0,
       borderBottom: '1px dotted #000',
+      padding: '0 2px',
+      textShadow: '1px 1px #888',
     };
 
     return (
       <p style={colorStyle}>
-        <span>{colorRange.fromInclusive}</span> - <span>{colorRange.toExclusive}</span>
+        <span>{colorRange.fromInclusive || 'NaN'}</span> - <span>{colorRange.toExclusive || 'NaN'}</span>
       </p>
     );
-  }
+  };
 
   render() {
     const { renderColorRange } = this;
