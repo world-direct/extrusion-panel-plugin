@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 export interface ViewOptions {
   center?: [number, number];
   zoom?: [number];
@@ -6,14 +8,14 @@ export interface ViewOptions {
 }
 
 export enum Metric {
-  ParticulateMatter10 = 'Particulate Matter 10',
-  ParticulateMatter25 = 'Particulate Matter 25',
-  NitrogenDioxide = 'Nitrogen Dioxide',
-  Ozone = 'Ozone',
-  SulfurDioxide = 'Sulfur Dioxide',
-  Temperature = 'Temperature',
-  Humidity = 'Humidity',
-  Pressure = 'Pressure',
+  ParticulateMatter10 = 'ParticulateMatter10' as any,
+  ParticulateMatter25 = 'ParticulateMatter25' as any,
+  NitrogenDioxide = 'NitrogenDioxide' as any,
+  Ozone = 'Ozone' as any,
+  SulfurDioxide = 'SulfurDioxide' as any,
+  Temperature = 'Temperature' as any,
+  Humidity = 'Humidity' as any,
+  Pressure = 'Pressure' as any,
 }
 
 export interface GeoJsonDataState {
@@ -21,6 +23,7 @@ export interface GeoJsonDataState {
   geoJson: object;
   viewOptions: ViewOptions;
   metric: Metric;
+  colorSchemes: ColorScheme[];
 }
 
 export interface Options {
@@ -36,3 +39,18 @@ export const defaults: Options = {
   apiUser: '<set api user>',
   apiPassword: '<set api password>',
 };
+
+export interface Styles {
+  [key: string]: CSSProperties;
+}
+
+export interface ColorScheme {
+  metric: Metric;
+  colorRangeItems: ColorRange[];
+}
+
+export interface ColorRange {
+  fromInclusive?: number | null;
+  toExclusive?: number | null;
+  color: string;
+}
