@@ -1,10 +1,12 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, CSSProperties } from 'react';
 import Dropdown, { Option } from 'react-dropdown';
 import 'react-dropdown/style.css';
 import { PanelProps } from '@grafana/ui';
 import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
-import { Options, GeoJsonDataState, Metric } from './types';
+import { Options, GeoJsonDataState, Metric, SelectionProps } from './types';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { AbsoluteTimeRange } from '@grafana/data';
+import { classProperty } from '@babel/types';
 
 export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
   private staticMetricOptions: Option[];
@@ -109,6 +111,14 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
 
     const options = this.staticMetricOptions;
 
+    const legendStyle: CSSProperties = {
+      zIndex: 1,
+      position: 'absolute',
+      top: 50,
+      bottom: 0,
+      width: 200,
+    }
+
     return (
       <div>
         <div>
@@ -130,6 +140,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
           >
             <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
           </Map>
+          <div style={legendStyle}>Legend</div>
         </div>
       </div>
     );

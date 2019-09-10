@@ -6,6 +6,11 @@ The Extrusion panel plugin allows to extrude geometries provided as [GeoJSON](ht
 
 ### Development build
 
+Install yarn, and use
+```
+yarn install
+```
+
 To build the plugin for the use in the development:
 ```
 yarn dev
