@@ -2,6 +2,7 @@ import { PanelProps } from '@grafana/ui';
 import { LegendBox } from 'LegendBox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MetricSelect } from 'MetricSelect';
+import { LoadingSpinner } from 'LoadingSpinner';
 import React, { PureComponent } from 'react';
 import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
 import { GeoJsonDataState, Metric, Options } from './types';
@@ -91,7 +92,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
     });
 
     if (this.state.isLoading) {
-      return <p>Loading ...</p>;
+      return <LoadingSpinner />;
     }
 
     const geoJson = this.state.geoJson;

@@ -1,6 +1,5 @@
 import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { Component } from 'react';
 import { Metric, Styles } from './types';
 

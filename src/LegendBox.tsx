@@ -1,6 +1,5 @@
 import React, { Component, CSSProperties } from 'react';
 import { Styles, ColorScheme, ColorRange } from './types';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 const classes: Styles = {
   container: {
