@@ -13,10 +13,8 @@ const classes: Styles = {
     right: 0,
     bottom: 0,
     left: 0,
-    width: 67,
-    height: 67,
-    lineHeight: 67,
-    display: 'block',
+    width: 68,
+    height: 68,
   },
 };
 
