@@ -1,5 +1,5 @@
-import { Select } from '@grafana/ui';
 import { SelectableValue } from '@grafana/data';
+import { Select } from '@grafana/ui';
 import React, { Component } from 'react';
 import { Metric, Styles } from './types';
 
@@ -35,6 +35,14 @@ export class MetricSelect extends Component<Props, State> {
     show: true,
   };
 
+  componentDidMount() {
+    const $style = document.createElement('style');
+    if (document && document.head) {
+      document.head.appendChild($style);
+      $style.innerHTML = '#metricSelect .gf-form-input {border-radius: 0;}';
+    }
+  }
+
   onMetricChange = (selected: SelectableValue<Metric>) => {
     const { onChange } = this.props;
 
@@ -65,7 +73,7 @@ export class MetricSelect extends Component<Props, State> {
     const { value } = this.props;
 
     return (
-      <div style={classes['container']}>
+      <div id="metricSelect" style={classes['container']}>
         <Select value={getSelectable(value)} options={getSelectableOptions()} onChange={onMetricChange} />
       </div>
     );
