@@ -1,7 +1,5 @@
 import React, { Component, CSSProperties } from 'react';
-import 'react-dropdown/style.css';
 import { Styles, ColorScheme, ColorRange } from './types';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 const classes: Styles = {
   container: {
@@ -13,6 +11,10 @@ const classes: Styles = {
     background: '#fff',
     padding: 4,
     opacity: 0.8,
+  },
+  infinity: {
+    position: 'relative',
+    top: 1,
   },
 };
 
@@ -45,21 +47,23 @@ export class LegendBox extends Component<Props, State> {
 
   renderColorRange = (colorRange: ColorRange): JSX.Element => {
     const { isTooDark } = this;
+    const { classes } = this.props;
 
     const color = colorRange.color ? colorRange.color : '#fff';
 
     const colorStyle: CSSProperties = {
       color: isTooDark(color) ? '#fff' : '#000',
       backgroundColor: color,
-      marginBottom: 0,
-      borderBottom: '1px dotted #000',
+      marginBottom: 3,
       padding: '0 2px',
       textShadow: '1px 1px #888',
+      boxShadow: '2px 2px #888',
     };
 
     return (
       <p style={colorStyle}>
-        <span>{colorRange.fromInclusive || 'NaN'}</span> - <span>{colorRange.toExclusive || 'NaN'}</span>
+        {colorRange.fromInclusive || <span style={classes['infinity']}>&infin;</span>} -{' '}
+        {colorRange.toExclusive || <span style={classes['infinity']}>&infin;</span>}
       </p>
     );
   };

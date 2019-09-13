@@ -1,15 +1,15 @@
-import React, { PureComponent } from 'react';
-import Dropdown, { Option } from 'react-dropdown';
-import 'react-dropdown/style.css';
 import { PanelProps } from '@grafana/ui';
-import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
-import { Options, GeoJsonDataState, Metric } from './types';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { LegendBox } from 'LegendBox';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { MetricSelect } from 'MetricSelect';
+import { LoadingSpinner } from 'LoadingSpinner';
+import React, { PureComponent } from 'react';
+import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
+import { GeoJsonDataState, Metric, Options } from './types';
 
 export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
-  private staticMetricOptions: Option[];
-  private onMetricChange: (selectedOption: Option) => void;
+  private staticMetricOptions: Metric[];
+  private onMetricChange: (item: Metric) => void;
 
   constructor(props: any) {
     super(props);
@@ -27,18 +27,17 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
     };
   }
 
-  getMetricOptions(): Option[] {
-    const options = new Array<Option>();
+  getMetricOptions(): Metric[] {
+    const options = new Array<Metric>();
     for (const metric in Metric) {
-      options.push({ label: Metric[metric], value: metric });
+      options.push((Metric[metric] as unknown) as Metric);
     }
     return options;
   }
 
-  onMetricChangeFunction(selectedOption: Option) {
-    const tmpMetric = (selectedOption.value as unknown) as Metric;
-    this.setState({ metric: tmpMetric });
-    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, tmpMetric);
+  onMetricChangeFunction(metric: Metric) {
+    this.setState({ metric: metric });
+    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, metric);
   }
 
   reload(apiUri: string, apiUser: string, apiPassword: string, metric: Metric) {
@@ -93,7 +92,7 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
     });
 
     if (this.state.isLoading) {
-      return <p>Loading ...</p>;
+      return <LoadingSpinner />;
     }
 
     const geoJson = this.state.geoJson;
@@ -126,28 +125,24 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
 
     return (
       <div>
-        <div>
-          <Dropdown options={options} value={(this.state.metric as unknown) as string} onChange={this.onMetricChange} />
-        </div>
-        <div>
-          <Map
-            style="mapbox://styles/mapbox/streets-v11"
-            center={viewOptions.center}
-            zoom={viewOptions.zoom}
-            pitch={viewOptions.pitch}
-            bearing={viewOptions.bearing}
-            containerStyle={{
-              position: 'absolute',
-              top: 50,
-              bottom: 0,
-              left: 0,
-              width: '100%',
-            }}
-          >
-            <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
-          </Map>
-          <LegendBox colorScheme={colorScheme} />
-        </div>
+        <MetricSelect options={options} onChange={this.onMetricChange} value={this.state.metric} />
+        <Map
+          style="mapbox://styles/mapbox/streets-v11"
+          center={viewOptions.center}
+          zoom={viewOptions.zoom}
+          pitch={viewOptions.pitch}
+          bearing={viewOptions.bearing}
+          containerStyle={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            width: '100%',
+          }}
+        >
+          <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
+        </Map>
+        <LegendBox colorScheme={colorScheme} />
       </div>
     );
   }
