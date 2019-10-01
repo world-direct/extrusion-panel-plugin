@@ -14,7 +14,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     viewOptions: {},
     colorSchemes: [],
     locations: [],
-    metric: Metric.ParticulateMatter10 as Metric,
+    metric: Metric.ParticulateMatter10,
     location: {},
   };
 
@@ -80,7 +80,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     const { getMetricOptions, onMetricChange, onLocationChange } = this;
     const { timeRange } = this.props;
     const { accessToken } = this.props.options;
-    const { isLoading, colorSchemes, viewOptions, mapJson, locations, graphJson } = this.state;
+    const { isLoading, colorSchemes, viewOptions, mapJson, locations, graphJson, metric, location } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -95,6 +95,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           viewOptions={viewOptions}
           mapJson={mapJson}
           accessToken={accessToken}
+          metric={metric}
         />
       );
     }
@@ -108,6 +109,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           timeRange={timeRange}
           locations={locations}
           graphJson={graphJson}
+          metric={metric}
+          location={location}
         />
       );
     }
@@ -115,7 +118,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     return <p>Invalid display option.</p>;
   }
 
-  getMapData(apiMapUri: string, apiUser: string, apiPassword: string, metric: Metric) {
+  getMapData = (apiMapUri: string, apiUser: string, apiPassword: string, metric: Metric) => {
     this.setState({ isLoading: true });
 
     const query = apiMapUri.concat(
@@ -141,18 +144,23 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           mapJson: data.geoJson,
           viewOptions: data.viewOptions,
           colorSchemes: data.colorSchemes,
+          locations: data.virtualLocations,
         })
       );
-  }
+  };
 
-  getGraphData(apiGraphUri: string, apiUser: string, apiPassword: string, metric: Metric, location: VirtualLocation) {
+  getGraphData = (apiGraphUri: string, apiUser: string, apiPassword: string, metric: Metric, location: VirtualLocation) => {
+    if (!location.longitude || !location.latitude) {
+      return;
+    }
+
     this.setState({ isLoading: true });
 
     const query = apiGraphUri.concat(
-      '?longitude=' +
-        encodeURIComponent(location.longitude + '') +
-        '?latitude=' +
+      '?latitude=' +
         encodeURIComponent(location.latitude + '') +
+        '&longitude=' +
+        encodeURIComponent(location.longitude + '') +
         '&metric=' +
         encodeURIComponent((metric as unknown) as string) +
         '&fromUTC=' +
@@ -176,6 +184,6 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           locations: data.virtualLocations,
         })
       );
-  }
+  };
 }
 export default ExtrusionPanel;

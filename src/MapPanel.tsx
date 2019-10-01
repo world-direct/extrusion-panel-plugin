@@ -29,20 +29,12 @@ type Props = Readonly<{
   viewOptions: ViewOptions;
   mapJson: object;
   accessToken: string;
-}>;
-
-type State = Readonly<{
   metric: Metric;
 }>;
 
-class MapPanel extends React.Component<Props, State> {
-  readonly state: State = {
-    metric: Metric.ParticulateMatter10,
-  };
-
+class MapPanel extends React.Component<Props> {
   getColorScheme = (): ColorScheme | undefined => {
-    const { colorSchemes } = this.props;
-    const { metric } = this.state;
+    const { colorSchemes, metric } = this.props;
 
     let colorScheme = undefined;
     if (colorSchemes) {
@@ -54,14 +46,12 @@ class MapPanel extends React.Component<Props, State> {
   onMetricChange = (item: Metric) => {
     const { onMetricChange } = this.props;
 
-    this.setState({ metric: item });
     onMetricChange(item);
   };
 
   render() {
     const { getColorScheme, onMetricChange } = this;
-    const { metrics, viewOptions, mapJson, accessToken } = this.props;
-    const { metric } = this.state;
+    const { metrics, viewOptions, mapJson, accessToken, metric } = this.props;
 
     const Map = ReactMapboxGl({
       accessToken: accessToken,

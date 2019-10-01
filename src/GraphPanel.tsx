@@ -41,19 +41,11 @@ type Props = Readonly<{
   timeRange: TimeRange;
   locations: VirtualLocation[];
   graphJson: object;
-}>;
-
-type State = Readonly<{
   metric: Metric;
   location: VirtualLocation;
 }>;
 
-class GraphPanel extends React.Component<Props, State> {
-  readonly state: State = {
-    metric: Metric.ParticulateMatter10,
-    location: {},
-  };
-
+class GraphPanel extends React.Component<Props> {
   getLocationOptions = () => {
     const { locations } = this.props;
 
@@ -67,15 +59,16 @@ class GraphPanel extends React.Component<Props, State> {
     return options;
   };
 
-  getSeries() {
-    const { graphJson } = this.props;
-    const { metric } = this.state;
+  getSeries = () => {
+    const { graphJson, metric } = this.props;
 
     const data: GraphSeriesValue[][] = [];
     const anyGraphJson = graphJson as any;
 
+    console.log(anyGraphJson);
+
     // TODO!
-    if (anyGraphJson.values) {
+    if (anyGraphJson && Array.isArray(anyGraphJson.values)) {
       anyGraphJson.values.forEach((value: { value?: number; timestamp?: number }) => {
         if (value.value && value.timestamp) {
           data.push([value.timestamp, value.value]);
@@ -93,27 +86,26 @@ class GraphPanel extends React.Component<Props, State> {
         yAxis: 1,
       },
     ];
+
+    console.log(series);
     return series;
-  }
+  };
 
   onMetricChange = (item: Metric) => {
     const { onMetricChange } = this.props;
 
-    this.setState({ metric: item });
     onMetricChange(item);
   };
 
   onLocationChange = (item: VirtualLocation) => {
     const { onLocationChange } = this.props;
 
-    this.setState({ location: item });
     onLocationChange(item);
   };
 
   render() {
     const { getLocationOptions, onMetricChange, onLocationChange } = this;
-    const { metrics, timeRange } = this.props;
-    const { metric, location } = this.state;
+    const { metrics, timeRange, metric, location } = this.props;
 
     return (
       <div>
