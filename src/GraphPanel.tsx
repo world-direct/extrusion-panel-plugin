@@ -71,7 +71,7 @@ class GraphPanel extends React.Component<Props> {
     if (anyGraphJson && Array.isArray(anyGraphJson.values)) {
       anyGraphJson.values.forEach((value: { value?: number; timestamp?: number }) => {
         if (value.value && value.timestamp) {
-          data.push([value.timestamp, value.value]);
+          data.push([value.timestamp * 1000, value.value]);
         }
       });
     }
