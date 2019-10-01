@@ -1,31 +1,22 @@
 import { PanelProps } from '@grafana/ui';
-import { LegendBox } from 'LegendBox';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { MetricSelect } from 'MetricSelect';
 import { LoadingSpinner } from 'LoadingSpinner';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { PureComponent } from 'react';
-import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
-import { GeoJsonDataState, Metric, Options } from './types';
+import GraphPanel from './GraphPanel';
+import MapPanel from './MapPanel';
+import { DisplayOption, GeoJsonDataState, Metric, Options, VirtualLocation } from './types';
 
-export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
-  private staticMetricOptions: Metric[];
-  private onMetricChange: (item: Metric) => void;
-
-  constructor(props: any) {
-    super(props);
-
-    this.staticMetricOptions = this.getMetricOptions();
-
-    this.onMetricChange = this.onMetricChangeFunction.bind(this);
-
-    this.state = {
-      isLoading: false,
-      geoJson: {},
-      viewOptions: {},
-      metric: Metric.ParticulateMatter10 as Metric,
-      colorSchemes: [],
-    };
-  }
+class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
+  readonly state: GeoJsonDataState = {
+    isLoading: false,
+    mapJson: {},
+    graphJson: {},
+    viewOptions: {},
+    colorSchemes: [],
+    locations: [],
+    metric: Metric.ParticulateMatter10 as Metric,
+    location: {},
+  };
 
   getMetricOptions(): Metric[] {
     const options = new Array<Metric>();
@@ -35,115 +26,156 @@ export class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDa
     return options;
   }
 
-  onMetricChangeFunction(metric: Metric) {
-    this.setState({ metric: metric });
-    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, metric);
-  }
+  onMetricChange = (item: Metric) => {
+    const { getMapData } = this;
+    const { apiMapUri, apiUser, apiPassword } = this.props.options;
 
-  reload(apiUri: string, apiUser: string, apiPassword: string, metric: Metric) {
-    this.setState({ isLoading: true });
-    fetch(
-      apiUri.concat(
-        '?metric=' +
-          encodeURIComponent((metric as unknown) as string) +
-          '&fromUTC=' +
-          encodeURIComponent(this.props.timeRange.from.unix() + '') +
-          '&toUTC=' +
-          encodeURIComponent(this.props.timeRange.to.unix() + '')
-      ),
-      {
-        mode: 'cors',
-        headers: new Headers({
-          Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
-          'Content-Type': 'application/json',
-        }),
-      }
-    )
-      .then(response => response.json())
-      .then(data =>
-        this.setState({
-          isLoading: false,
-          geoJson: data.geoJson,
-          viewOptions: data.viewOptions,
-          colorSchemes: data.colorScheme,
-        })
-      );
-  }
+    this.setState({ metric: item });
+    getMapData(apiMapUri, apiUser, apiPassword, item);
+  };
+
+  onLocationChange = (item: VirtualLocation) => {
+    const { getGraphData } = this;
+    const { apiGraphUri, apiUser, apiPassword } = this.props.options;
+    const { metric } = this.state;
+
+    this.setState({ location: item });
+    getGraphData(apiGraphUri, apiUser, apiPassword, metric, item);
+  };
 
   componentDidUpdate(prevProps: PanelProps<Options>) {
+    const { getMapData, getGraphData } = this;
+    const { apiGraphUri, apiMapUri, apiUser, apiPassword } = this.props.options;
+    const { metric, location } = this.state;
+
     if (
       this.props.options.apiUser !== prevProps.options.apiUser ||
       this.props.options.apiPassword !== prevProps.options.apiPassword ||
-      this.props.options.apiUri !== prevProps.options.apiUri ||
       this.props.timeRange.from.unix() !== prevProps.timeRange.from.unix() ||
       this.props.timeRange.to.unix() !== prevProps.timeRange.to.unix()
     ) {
-      this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, this.state.metric);
+      getMapData(apiMapUri, apiUser, apiPassword, metric);
+      getGraphData(apiGraphUri, apiUser, apiPassword, metric, location);
+    }
+
+    if (this.props.options.apiMapUri !== prevProps.options.apiMapUri) {
+      getMapData(apiMapUri, apiUser, apiPassword, metric);
+    }
+
+    if (this.props.options.apiGraphUri !== prevProps.options.apiGraphUri) {
+      getGraphData(apiGraphUri, apiUser, apiPassword, metric, location);
     }
   }
 
   componentDidMount() {
-    this.reload(this.props.options.apiUri, this.props.options.apiUser, this.props.options.apiPassword, this.state.metric);
+    const { getMapData, getGraphData } = this;
+    const { apiGraphUri, apiMapUri, apiUser, apiPassword } = this.props.options;
+    const { metric, location } = this.state;
+
+    getMapData(apiMapUri, apiUser, apiPassword, metric);
+    getGraphData(apiGraphUri, apiUser, apiPassword, metric, location);
   }
 
   render() {
-    const Map = ReactMapboxGl({
-      accessToken: this.props.options.accessToken,
-    });
+    const { getMetricOptions, onMetricChange, onLocationChange } = this;
+    const { timeRange } = this.props;
+    const { accessToken } = this.props.options;
+    const { isLoading, colorSchemes, viewOptions, mapJson, locations, graphJson } = this.state;
 
-    if (this.state.isLoading) {
+    if (isLoading) {
       return <LoadingSpinner />;
     }
 
-    const geoJson = this.state.geoJson;
-    const viewOptions = this.state.viewOptions;
-
-    const paint = {
-      // See the Mapbox Style Specification for details on data expressions.
-      // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions
-
-      // Get the fill-extrusion-color from the source 'color' property.
-      'fill-extrusion-color': ['get', 'color'],
-
-      // Get fill-extrusion-height from the source 'height' property.
-      'fill-extrusion-height': ['get', 'height'],
-
-      // Get fill-extrusion-base from the source 'base_height' property.
-      'fill-extrusion-base': ['get', 'base_height'],
-
-      // Make extrusions slightly opaque for see through indoor walls.
-      'fill-extrusion-opacity': 0.5,
-    };
-
-    const options = this.staticMetricOptions;
-
-    let colorScheme = undefined;
-
-    if (this.state.colorSchemes) {
-      colorScheme = this.state.colorSchemes.find(c => c.metric === this.state.metric);
+    if (this.props.options.display === DisplayOption.Map) {
+      return (
+        <MapPanel
+          metrics={getMetricOptions()}
+          onMetricChange={onMetricChange}
+          colorSchemes={colorSchemes}
+          viewOptions={viewOptions}
+          mapJson={mapJson}
+          accessToken={accessToken}
+        />
+      );
     }
 
-    return (
-      <div>
-        <MetricSelect options={options} onChange={this.onMetricChange} value={this.state.metric} />
-        <Map
-          style="mapbox://styles/mapbox/streets-v11"
-          center={viewOptions.center}
-          zoom={viewOptions.zoom}
-          pitch={viewOptions.pitch}
-          bearing={viewOptions.bearing}
-          containerStyle={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            width: '100%',
-          }}
-        >
-          <GeoJSONLayer id="metric" type="fill-extrusion" data={geoJson} fillExtrusionPaint={paint} />
-        </Map>
-        <LegendBox colorScheme={colorScheme} />
-      </div>
+    if (this.props.options.display === DisplayOption.Graph) {
+      return (
+        <GraphPanel
+          metrics={getMetricOptions()}
+          onMetricChange={onMetricChange}
+          onLocationChange={onLocationChange}
+          timeRange={timeRange}
+          locations={locations}
+          graphJson={graphJson}
+        />
+      );
+    }
+
+    return <p>Invalid display option.</p>;
+  }
+
+  getMapData(apiMapUri: string, apiUser: string, apiPassword: string, metric: Metric) {
+    this.setState({ isLoading: true });
+
+    const query = apiMapUri.concat(
+      '?metric=' +
+        encodeURIComponent((metric as unknown) as string) +
+        '&fromUTC=' +
+        encodeURIComponent(this.props.timeRange.from.unix() + '') +
+        '&toUTC=' +
+        encodeURIComponent(this.props.timeRange.to.unix() + '')
     );
+
+    fetch(query, {
+      mode: 'cors',
+      headers: new Headers({
+        Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(response => response.json())
+      .then(data =>
+        this.setState({
+          isLoading: false,
+          mapJson: data.geoJson,
+          viewOptions: data.viewOptions,
+          colorSchemes: data.colorSchemes,
+        })
+      );
+  }
+
+  getGraphData(apiGraphUri: string, apiUser: string, apiPassword: string, metric: Metric, location: VirtualLocation) {
+    this.setState({ isLoading: true });
+
+    const query = apiGraphUri.concat(
+      '?longitude=' +
+        encodeURIComponent(location.longitude + '') +
+        '?latitude=' +
+        encodeURIComponent(location.latitude + '') +
+        '&metric=' +
+        encodeURIComponent((metric as unknown) as string) +
+        '&fromUTC=' +
+        encodeURIComponent(this.props.timeRange.from.unix() + '') +
+        '&toUTC=' +
+        encodeURIComponent(this.props.timeRange.to.unix() + '')
+    );
+
+    fetch(query, {
+      mode: 'cors',
+      headers: new Headers({
+        Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(response => response.json())
+      .then(data =>
+        this.setState({
+          isLoading: false,
+          graphJson: data.graphJson,
+          locations: data.virtualLocations,
+        })
+      );
   }
 }
+export default ExtrusionPanel;

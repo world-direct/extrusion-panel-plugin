@@ -1,8 +1,9 @@
-import React, { PureComponent, ChangeEvent } from 'react';
-import { PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup, FormField } from '@grafana/ui';
-import { Options } from './types';
+import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup } from '@grafana/ui';
+import { ExtrusionSelect } from 'ExtrusionSelect';
+import React, { ChangeEvent, PureComponent } from 'react';
+import { DisplayOption, Options } from './types';
 
-export class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
+class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
   constructor(props: PanelEditorProps<Options>) {
     super(props);
   }
@@ -14,10 +15,17 @@ export class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options
     });
   };
 
-  onApiUriChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onApiMapUriChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onOptionsChange({
       ...this.props.options,
-      apiUri: event.target.value,
+      apiMapUri: event.target.value,
+    });
+  };
+
+  onApiGraphUriChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      apiGraphUri: event.target.value,
     });
   };
 
@@ -35,35 +43,62 @@ export class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options
     });
   };
 
+  onDisplayChange = (option: DisplayOption) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      display: option,
+    });
+  };
+
+  getDisplayOptions = () => {
+    const options = new Array<DisplayOption>();
+    for (const option in DisplayOption) {
+      options.push((option as unknown) as DisplayOption);
+    }
+    return options;
+  };
+
   render() {
+    const {
+      onApiMapUriChange,
+      onApiGraphUriChange,
+      onApiUserChange,
+      onApiPasswordChange,
+      onAccessTokenChange,
+      onDisplayChange,
+      getDisplayOptions,
+    } = this;
     const { options } = this.props;
-    const { accessToken, apiUri, apiUser, apiPassword } = options;
+    const { accessToken, apiMapUri, apiGraphUri, apiUser, apiPassword, display } = options;
 
     return (
       <PanelOptionsGrid>
         <PanelOptionsGroup title="JSON REST API">
           <div className="gf-form">
-            <FormField label={'Root-Uri'} labelWidth={20} inputWidth={30} onChange={this.onApiUriChange} value={apiUri} />
+            <FormField label={'Map-Data-Uri'} labelWidth={20} inputWidth={30} onChange={onApiMapUriChange} value={apiMapUri} />
           </div>
           <div className="gf-form">
-            <FormField label={'Basic-Authentication-User'} labelWidth={20} inputWidth={30} onChange={this.onApiUserChange} value={apiUser} />
+            <FormField label={'Graph-Data-Uri'} labelWidth={20} inputWidth={30} onChange={onApiGraphUriChange} value={apiGraphUri} />
           </div>
           <div className="gf-form">
-            <FormField
-              label={'Basic-Authentication-Password'}
-              labelWidth={20}
-              inputWidth={30}
-              onChange={this.onApiPasswordChange}
-              value={apiPassword}
-            />
+            <FormField label={'Basic-Authentication-User'} labelWidth={20} inputWidth={30} onChange={onApiUserChange} value={apiUser} />
+          </div>
+          <div className="gf-form">
+            <FormField label={'Basic-Authentication-Password'} labelWidth={20} inputWidth={30} onChange={onApiPasswordChange} value={apiPassword} />
           </div>
         </PanelOptionsGroup>
         <PanelOptionsGroup title="Mapbox credentials">
           <div className="gf-form">
-            <FormField label={'Access token'} labelWidth={20} inputWidth={30} onChange={this.onAccessTokenChange} value={accessToken} />
+            <FormField label={'Access token'} labelWidth={20} inputWidth={30} onChange={onAccessTokenChange} value={accessToken} />
+          </div>
+        </PanelOptionsGroup>
+        <PanelOptionsGroup title="Display options">
+          <div className="gf-form">
+            <ExtrusionSelect<DisplayOption> options={getDisplayOptions()} onChange={onDisplayChange} value={display} />
           </div>
         </PanelOptionsGroup>
       </PanelOptionsGrid>
     );
   }
 }
+export default ExtrusionPanelEditor;
