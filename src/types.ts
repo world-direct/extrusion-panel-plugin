@@ -7,11 +7,6 @@ export interface ViewOptions {
   pitch?: [number];
 }
 
-export enum DisplayOption {
-  Map = 'Map' as any,
-  Graph = 'Graph' as any,
-}
-
 export enum Metric {
   ParticulateMatter10 = 'ParticulateMatter10' as any,
   ParticulateMatter25 = 'ParticulateMatter25' as any,
@@ -30,8 +25,6 @@ export interface GeoJsonDataState {
   viewOptions: ViewOptions;
   metric: Metric;
   colorSchemes: ColorScheme[];
-  locations: VirtualLocation[];
-  location: VirtualLocation;
 }
 
 export interface Options {
@@ -40,7 +33,12 @@ export interface Options {
   apiGraphUri: string;
   apiUser: string;
   apiPassword: string;
-  display: DisplayOption;
+  showMap: boolean;
+  showGraph: boolean;
+  showLines: boolean;
+  showPoints: boolean;
+  longitude?: number;
+  latitude?: number;
 }
 
 export const defaults: Options = {
@@ -49,7 +47,10 @@ export const defaults: Options = {
   apiGraphUri: '<set api root-uri>',
   apiUser: '<set api user>',
   apiPassword: '<set api password>',
-  display: DisplayOption.Map,
+  showMap: true,
+  showGraph: false,
+  showLines: true,
+  showPoints: false,
 };
 
 export interface Styles {
@@ -69,6 +70,6 @@ export interface ColorRange {
 
 export interface VirtualLocation {
   name?: string;
-  latitude?: number;
   longitude?: number;
+  latitude?: number;
 }

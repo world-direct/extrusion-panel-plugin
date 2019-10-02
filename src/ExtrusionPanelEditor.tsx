@@ -1,7 +1,6 @@
-import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup } from '@grafana/ui';
-import { ExtrusionSelect } from 'ExtrusionSelect';
+import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
-import { DisplayOption, Options } from './types';
+import { Options } from './types';
 
 class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
   constructor(props: PanelEditorProps<Options>) {
@@ -43,19 +42,46 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
-  onDisplayChange = (option: DisplayOption) => {
+  onShowMapChange = () => {
     this.props.onOptionsChange({
       ...this.props.options,
-      display: option,
+      showMap: !this.props.options.showMap,
     });
   };
 
-  getDisplayOptions = () => {
-    const options = new Array<DisplayOption>();
-    for (const option in DisplayOption) {
-      options.push((option as unknown) as DisplayOption);
-    }
-    return options;
+  onShowGraphChange = () => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      showGraph: !this.props.options.showGraph,
+    });
+  };
+
+  onShowLinesChange = () => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      showLines: !this.props.options.showLines,
+    });
+  };
+
+  onShowPointsChange = () => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      showPoints: !this.props.options.showPoints,
+    });
+  };
+
+  onLongitudeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      longitude: Number(event.target.value),
+    });
+  };
+
+  onLatitudeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      latitude: Number(event.target.value),
+    });
   };
 
   render() {
@@ -65,11 +91,15 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
       onApiUserChange,
       onApiPasswordChange,
       onAccessTokenChange,
-      onDisplayChange,
-      getDisplayOptions,
+      onShowMapChange,
+      onShowGraphChange,
+      onShowLinesChange,
+      onShowPointsChange,
+      onLongitudeChange,
+      onLatitudeChange,
     } = this;
     const { options } = this.props;
-    const { accessToken, apiMapUri, apiGraphUri, apiUser, apiPassword, display } = options;
+    const { accessToken, apiMapUri, apiGraphUri, apiUser, apiPassword, showGraph, showMap, showLines, showPoints, longitude, latitude } = options;
 
     return (
       <PanelOptionsGrid>
@@ -86,6 +116,12 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
           <div className="gf-form">
             <FormField label={'Basic-Authentication-Password'} labelWidth={20} inputWidth={30} onChange={onApiPasswordChange} value={apiPassword} />
           </div>
+          <div className="gf-form">
+            <FormField label="Longitude" onChange={onLongitudeChange} value={longitude} />
+          </div>
+          <div className="gf-form">
+            <FormField label="Latitude" onChange={onLatitudeChange} value={latitude} />
+          </div>
         </PanelOptionsGroup>
         <PanelOptionsGroup title="Mapbox credentials">
           <div className="gf-form">
@@ -94,7 +130,16 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
         </PanelOptionsGroup>
         <PanelOptionsGroup title="Display options">
           <div className="gf-form">
-            <ExtrusionSelect<DisplayOption> options={getDisplayOptions()} onChange={onDisplayChange} value={display} />
+            <Switch label="Show map" checked={showMap} onChange={onShowMapChange} />
+          </div>
+          <div className="gf-form">
+            <Switch label="Show graph" checked={showGraph} onChange={onShowGraphChange} />
+          </div>
+          <div className="gf-form">
+            <Switch label="Show lines" checked={showLines} onChange={onShowLinesChange} />
+          </div>
+          <div className="gf-form">
+            <Switch label="Show points" checked={showPoints} onChange={onShowPointsChange} />
           </div>
         </PanelOptionsGroup>
       </PanelOptionsGrid>

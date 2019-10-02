@@ -16,7 +16,7 @@ const selectStyle: CSSProperties = {
 
 const containerStyle: CSSProperties = {
   position: 'absolute',
-  top: 0,
+  top: 6,
   bottom: 0,
   left: 0,
   width: '100%',
@@ -30,6 +30,7 @@ type Props = Readonly<{
   mapJson: object;
   accessToken: string;
   metric: Metric;
+  showGraph: boolean;
 }>;
 
 class MapPanel extends React.Component<Props> {
@@ -51,7 +52,7 @@ class MapPanel extends React.Component<Props> {
 
   render() {
     const { getColorScheme, onMetricChange } = this;
-    const { metrics, viewOptions, mapJson, accessToken, metric } = this.props;
+    const { metrics, viewOptions, mapJson, accessToken, metric, showGraph } = this.props;
 
     const Map = ReactMapboxGl({
       accessToken: accessToken,
@@ -76,7 +77,8 @@ class MapPanel extends React.Component<Props> {
 
     return (
       <div>
-        <ExtrusionSelect<Metric> options={metrics} style={selectStyle} onChange={onMetricChange} value={metric} />
+        {!showGraph && <ExtrusionSelect<Metric> options={metrics} style={selectStyle} onChange={onMetricChange} value={metric} />}
+
         <Map
           style="mapbox://styles/mapbox/streets-v11"
           center={viewOptions.center}
