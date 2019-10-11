@@ -5,6 +5,7 @@ import React, { PureComponent, CSSProperties } from 'react';
 import GraphPanel from './GraphPanel';
 import MapPanel from './MapPanel';
 import { GeoJsonDataState, Metric, Options } from './types';
+import { AbsoluteTimeRange } from '@grafana/data';
 
 const leftContainerStyle: CSSProperties = {
   width: '50%',
@@ -84,8 +85,17 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     getGraphData();
   }
 
+  onHorizontalRegionSelected = (from: number, to: number) => {
+    const newTimeRange: AbsoluteTimeRange = {
+      from: from,
+      to: to,
+    };
+
+    this.props.onChangeTimeRange(newTimeRange);
+  };
+
   render() {
-    const { getMetricOptions, onMetricChange } = this;
+    const { getMetricOptions, onMetricChange, onHorizontalRegionSelected } = this;
     const { timeRange } = this.props;
     const { accessToken, showGraph, showMap, showLines, showPoints } = this.props.options;
     const { isLoading, colorSchemes, viewOptions, mapJson, graphJson, metric } = this.state;
@@ -119,6 +129,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
               showLines={showLines}
               showPoints={showPoints}
               showMap={showMap}
+              onHorizontalRegionSelected={onHorizontalRegionSelected}
             />
           </div>
         </>
@@ -151,6 +162,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           showLines={showLines}
           showPoints={showPoints}
           showMap={showMap}
+          onHorizontalRegionSelected={onHorizontalRegionSelected}
         />
       );
     }

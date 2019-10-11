@@ -1,4 +1,4 @@
-import { dateTime, TimeRange, TimeZone, GraphSeriesValue, GraphSeriesXY } from '@grafana/data';
+import { TimeRange, TimeZone, GraphSeriesValue, GraphSeriesXY } from '@grafana/data';
 import { Graph, Button } from '@grafana/ui';
 import React, { CSSProperties } from 'react';
 import { ExtrusionSelect } from './ExtrusionSelect';
@@ -40,6 +40,7 @@ type Props = Readonly<{
   showLines: boolean;
   showPoints: boolean;
   showMap: boolean;
+  onHorizontalRegionSelected: (from: number, to: number) => void;
 }>;
 
 type State = Readonly<{
@@ -91,6 +92,7 @@ class GraphPanel extends React.Component<Props, State> {
     onMetricChange(item);
   };
 
+  /*
   onHorizontalRegionSelected = (from: number, to: number) => {
     const newTimeRange: TimeRange = {
       from: dateTime(from),
@@ -103,6 +105,7 @@ class GraphPanel extends React.Component<Props, State> {
 
     this.setState({ timeRange: newTimeRange });
   };
+  */
 
   onExportClick = () => {
     const { graphJson, metric } = this.props;
@@ -130,8 +133,8 @@ class GraphPanel extends React.Component<Props, State> {
   };
 
   render() {
-    const { onMetricChange, onHorizontalRegionSelected, onExportClick } = this;
-    const { metrics, metric, showLines, showPoints, showMap } = this.props;
+    const { onMetricChange, onExportClick } = this;
+    const { metrics, metric, showLines, showPoints, showMap, onHorizontalRegionSelected } = this.props;
     const { timeRange } = this.state;
 
     const timeZone: TimeZone = 'utc';
