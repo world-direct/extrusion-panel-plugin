@@ -8,7 +8,7 @@ const selectStyle: CSSProperties = {
   width: 200,
   opacity: 0.8,
   position: 'absolute',
-  top: 2,
+  top: 8,
   left: 2,
   zIndex: 1,
   boxShadow: '2px 2px #888',

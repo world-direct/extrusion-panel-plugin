@@ -5,6 +5,7 @@ import React, { PureComponent, CSSProperties } from 'react';
 import GraphPanel from './GraphPanel';
 import MapPanel from './MapPanel';
 import { GeoJsonDataState, Metric, Options } from './types';
+import { AbsoluteTimeRange } from '@grafana/data';
 
 const leftContainerStyle: CSSProperties = {
   width: '50%',
@@ -45,15 +46,17 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     const { showMap, showGraph } = this.props.options;
 
     this.setState({ metric: item });
+
     if (showMap) {
-      getMapData();
+      getMapData(item);
     }
     if (showGraph) {
-      getGraphData();
+      getGraphData(item);
     }
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>) {
+    const { metric } = this.state;
     const { getMapData, getGraphData } = this;
 
     if (
@@ -64,28 +67,38 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       this.props.options.longitude !== prevProps.options.longitude ||
       this.props.options.latitude !== prevProps.options.latitude
     ) {
-      getMapData();
-      getGraphData();
+      getMapData(metric);
+      getGraphData(metric);
     } else {
       if (this.props.options.apiMapUri !== prevProps.options.apiMapUri) {
-        getMapData();
+        getMapData(metric);
       }
 
       if (this.props.options.apiGraphUri !== prevProps.options.apiGraphUri) {
-        getGraphData();
+        getGraphData(metric);
       }
     }
   }
 
   componentDidMount() {
     const { getMapData, getGraphData } = this;
+    const { metric } = this.state;
 
-    getMapData();
-    getGraphData();
+    getMapData(metric);
+    getGraphData(metric);
   }
 
+  onHorizontalRegionSelected = (from: number, to: number) => {
+    const newTimeRange: AbsoluteTimeRange = {
+      from: from,
+      to: to,
+    };
+
+    this.props.onChangeTimeRange(newTimeRange);
+  };
+
   render() {
-    const { getMetricOptions, onMetricChange } = this;
+    const { getMetricOptions, onMetricChange, onHorizontalRegionSelected } = this;
     const { timeRange } = this.props;
     const { accessToken, showGraph, showMap, showLines, showPoints } = this.props.options;
     const { isLoading, colorSchemes, viewOptions, mapJson, graphJson, metric } = this.state;
@@ -119,6 +132,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
               showLines={showLines}
               showPoints={showPoints}
               showMap={showMap}
+              onHorizontalRegionSelected={onHorizontalRegionSelected}
             />
           </div>
         </>
@@ -151,6 +165,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           showLines={showLines}
           showPoints={showPoints}
           showMap={showMap}
+          onHorizontalRegionSelected={onHorizontalRegionSelected}
         />
       );
     }
@@ -158,9 +173,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     return <p>Invalid display option.</p>;
   }
 
-  getMapData = () => {
+  getMapData = (metric: Metric) => {
     const { apiMapUri, apiUser, apiPassword, longitude, latitude } = this.props.options;
-    const { metric } = this.state;
 
     this.setState({ isLoading: true });
 
@@ -197,9 +211,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       );
   };
 
-  getGraphData = () => {
+  getGraphData = (metric: Metric) => {
     const { apiGraphUri, apiUser, apiPassword, longitude, latitude } = this.props.options;
-    const { metric } = this.state;
 
     if (!longitude || !latitude) {
       this.setState({
@@ -239,4 +252,5 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       );
   };
 }
+
 export default ExtrusionPanel;

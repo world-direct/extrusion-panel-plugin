@@ -62,8 +62,8 @@ export class LegendBox extends Component<Props, State> {
 
     return (
       <p style={colorStyle}>
-        {colorRange.fromInclusive || <span style={classes['infinity']}>&infin;</span>} -{' '}
-        {colorRange.toExclusive || <span style={classes['infinity']}>&infin;</span>}
+        {colorRange.fromInclusive !== null ? colorRange.fromInclusive : <span style={classes['infinity']}>&infin;</span>} -{' '}
+        {colorRange.toExclusive !== null ? colorRange.toExclusive : <span style={classes['infinity']}>&infin;</span>}
       </p>
     );
   };
