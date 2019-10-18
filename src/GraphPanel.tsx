@@ -106,7 +106,7 @@ class GraphPanel extends React.Component<Props, State> {
           bytes.push(
             String(value.value).replace('.', ',') +
               '; ' +
-              moment(value.timestamp).format('DD-MM-YYYY hh:mm:ss') +
+              moment(value.timestamp * 1000).format('DD-MM-YYYY hh:mm:ss') +
               '; ' +
               String(value.latitude).replace('.', ',') +
               '; ' +
