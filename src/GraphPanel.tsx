@@ -3,6 +3,7 @@ import { Graph, Button } from '@grafana/ui';
 import React, { CSSProperties } from 'react';
 import { ExtrusionSelect } from './ExtrusionSelect';
 import { Metric } from './types';
+import moment from 'moment';
 
 const metricSelectStyle: CSSProperties = {
   width: 200,
@@ -92,21 +93,6 @@ class GraphPanel extends React.Component<Props, State> {
     onMetricChange(item);
   };
 
-  /*
-  onHorizontalRegionSelected = (from: number, to: number) => {
-    const newTimeRange: TimeRange = {
-      from: dateTime(from),
-      to: dateTime(to),
-      raw: {
-        from: dateTime(from),
-        to: dateTime(to),
-      },
-    };
-
-    this.setState({ timeRange: newTimeRange });
-  };
-  */
-
   onExportClick = () => {
     const { graphJson, metric } = this.props;
 
@@ -115,9 +101,20 @@ class GraphPanel extends React.Component<Props, State> {
 
     bytes.push('value; timestamp\n');
     if (anyGraphJson && Array.isArray(anyGraphJson.values)) {
-      anyGraphJson.values.forEach((value: { value?: number; timestamp?: number }) => {
+      anyGraphJson.values.forEach((value: { value?: string; timestamp?: number; latitude?: string; longitude?: string; serial?: string }) => {
         if (value.value && value.timestamp) {
-          bytes.push(value.value + '; ' + value.timestamp + '\n');
+          bytes.push(
+            String(value.value).replace('.', ',') +
+              '; ' +
+              moment(value.timestamp).format('DD-MM-YYYY hh:mm:ss') +
+              '; ' +
+              String(value.latitude).replace('.', ',') +
+              '; ' +
+              String(value.longitude).replace('.', ',') +
+              '; ' +
+              String(value.serial).replace('.', ',') +
+              '\n'
+          );
         }
       });
     }
