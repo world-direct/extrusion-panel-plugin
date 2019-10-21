@@ -99,7 +99,7 @@ class GraphPanel extends React.Component<Props, State> {
     const bytes: BlobPart[] = [];
     const anyGraphJson = graphJson as any;
 
-    bytes.push('value; timestamp\n');
+    bytes.push('value; timestamp; latitude; longitude; serial\n');
     if (anyGraphJson && Array.isArray(anyGraphJson.values)) {
       anyGraphJson.values.forEach((value: { value?: string; timestamp?: number; latitude?: string; longitude?: string; serial?: string }) => {
         if (value.value && value.timestamp) {
