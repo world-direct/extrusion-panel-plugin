@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
+import ReactMapboxGl, { GeoJSONLayer, Popup } from 'react-mapbox-gl';
 import { ExtrusionSelect } from './ExtrusionSelect';
 import { LegendBox } from './LegendBox';
 import { ColorScheme, Metric, ViewOptions } from './types';
@@ -22,6 +22,23 @@ const containerStyle: CSSProperties = {
   width: '100%',
 };
 
+const markerStyle: CSSProperties = {
+  color: '#000',
+};
+
+type Marker = {
+  features: [
+    {
+      properties: {
+        name: string;
+        description: string;
+        longitude: number;
+        latitude: number;
+      };
+    }
+  ];
+};
+
 type Props = Readonly<{
   metrics: Metric[];
   onMetricChange: (item: Metric) => void;
@@ -33,7 +50,15 @@ type Props = Readonly<{
   showGraph: boolean;
 }>;
 
-class MapPanel extends React.Component<Props> {
+type State = Readonly<{
+  marker?: Marker;
+}>;
+
+class MapPanel extends React.Component<Props, State> {
+  state: State = {
+    marker: undefined,
+  };
+
   getColorScheme = (): ColorScheme | undefined => {
     const { colorSchemes, metric } = this.props;
 
@@ -44,15 +69,22 @@ class MapPanel extends React.Component<Props> {
     return colorScheme;
   };
 
-  onMetricChange = (item: Metric) => {
+  onMetricChange = (metric: Metric) => {
     const { onMetricChange } = this.props;
 
-    onMetricChange(item);
+    onMetricChange(metric);
+  };
+
+  onExtrusionClick = (marker: Marker) => {
+    this.setState({
+      marker: marker,
+    });
   };
 
   render() {
-    const { getColorScheme, onMetricChange } = this;
+    const { getColorScheme, onMetricChange, onExtrusionClick } = this;
     const { metrics, viewOptions, mapJson, accessToken, metric, showGraph } = this.props;
+    const { marker } = this.state;
 
     const Map = ReactMapboxGl({
       accessToken: accessToken,
@@ -86,8 +118,23 @@ class MapPanel extends React.Component<Props> {
           pitch={viewOptions.pitch}
           bearing={viewOptions.bearing}
           containerStyle={containerStyle}
+          renderChildrenInPortal={true}
         >
-          <GeoJSONLayer id="metric" type="fill-extrusion" data={mapJson} fillExtrusionPaint={paint} />
+          <GeoJSONLayer
+            id="metric"
+            type="fill-extrusion"
+            data={mapJson}
+            fillExtrusionPaint={paint}
+            fillExtrusionOnClick={(marker: Marker) => onExtrusionClick(marker)}
+          />
+          {marker && (
+            <Popup
+              key={marker.features[0].properties.name}
+              coordinates={{ lon: marker.features[0].properties.longitude, lat: marker.features[0].properties.latitude }}
+            >
+              <div style={markerStyle}>{Number(marker.features[0].properties.description).toFixed(2)}</div>
+            </Popup>
+          )}
         </Map>
         <LegendBox colorScheme={getColorScheme()} />
       </div>
