@@ -1,5 +1,5 @@
-import React, { CSSProperties } from 'react';
-import ReactMapboxGl, { GeoJSONLayer, Popup } from 'react-mapbox-gl';
+import React, { CSSProperties, MouseEvent } from 'react';
+import ReactMapboxGl, { Popup, GeoJSONLayer } from 'react-mapbox-gl';
 import { ExtrusionSelect } from './ExtrusionSelect';
 import { LegendBox } from './LegendBox';
 import { ColorScheme, Metric, ViewOptions } from './types';
@@ -26,17 +26,12 @@ const markerStyle: CSSProperties = {
   color: '#000',
 };
 
-type Marker = {
-  features: [
-    {
-      properties: {
-        name: string;
-        description: string;
-        longitude: number;
-        latitude: number;
-      };
-    }
-  ];
+type PropertyType = {
+  name: string;
+  description: string;
+  longitude: number;
+  latitude: number;
+  height: number;
 };
 
 type Props = Readonly<{
@@ -51,12 +46,18 @@ type Props = Readonly<{
 }>;
 
 type State = Readonly<{
-  marker?: Marker;
+  marker?: PropertyType;
+  Map: any;
 }>;
 
 class MapPanel extends React.Component<Props, State> {
   state: State = {
     marker: undefined,
+    Map: ReactMapboxGl({
+      //minZoom: 2,
+      //maxZoom: 10,
+      accessToken: this.props.accessToken,
+    }),
   };
 
   getColorScheme = (): ColorScheme | undefined => {
@@ -75,20 +76,28 @@ class MapPanel extends React.Component<Props, State> {
     onMetricChange(metric);
   };
 
-  onExtrusionClick = (marker: Marker) => {
+  fillExtrusionOnMouseEnter = (event: any) => {
     this.setState({
-      marker: marker,
+      marker: event.features[0].properties,
+    });
+  };
+
+  fillExtrusionOnMouseLeave = (event: any) => {
+    this.setState({
+      marker: undefined,
+    });
+  };
+
+  fillExtrusionOnMouseClick = (event: MouseEvent<any>) => {
+    this.setState({
+      marker: event.currentTarget.properties,
     });
   };
 
   render() {
-    const { getColorScheme, onMetricChange, onExtrusionClick } = this;
-    const { metrics, viewOptions, mapJson, accessToken, metric, showGraph } = this.props;
-    const { marker } = this.state;
-
-    const Map = ReactMapboxGl({
-      accessToken: accessToken,
-    });
+    const { getColorScheme, onMetricChange, fillExtrusionOnMouseEnter, fillExtrusionOnMouseLeave } = this;
+    const { metrics, viewOptions, mapJson, metric, showGraph } = this.props;
+    const { marker, Map } = this.state;
 
     const paint = {
       // See the Mapbox Style Specification for details on data expressions.
@@ -118,21 +127,19 @@ class MapPanel extends React.Component<Props, State> {
           pitch={viewOptions.pitch}
           bearing={viewOptions.bearing}
           containerStyle={containerStyle}
-          renderChildrenInPortal={true}
         >
           <GeoJSONLayer
-            id="metric"
-            type="fill-extrusion"
             data={mapJson}
+            type="fill-extrusion"
+            id="metric"
             fillExtrusionPaint={paint}
-            fillExtrusionOnClick={(marker: Marker) => onExtrusionClick(marker)}
+            fillExtrusionOnMouseEnter={fillExtrusionOnMouseEnter}
+            fillExtrusionOnMouseLeave={fillExtrusionOnMouseLeave}
           />
+
           {marker && (
-            <Popup
-              key={marker.features[0].properties.name}
-              coordinates={{ lon: marker.features[0].properties.longitude, lat: marker.features[0].properties.latitude }}
-            >
-              <div style={markerStyle}>{Number(marker.features[0].properties.description).toFixed(2)}</div>
+            <Popup key={marker.name} coordinates={{ lon: marker.longitude, lat: marker.latitude }} offset={marker.height}>
+              <div style={markerStyle}>{Number(marker.description).toFixed(2)}</div>
             </Popup>
           )}
         </Map>
