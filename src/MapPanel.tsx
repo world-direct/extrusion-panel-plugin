@@ -82,20 +82,20 @@ class MapPanel extends React.Component<Props, State> {
     });
   };
 
-  fillExtrusionOnMouseLeave = (event: any) => {
+  fillExtrusionOnMouseLeave = () => {
     this.setState({
       marker: undefined,
     });
   };
 
-  fillExtrusionOnMouseClick = (event: MouseEvent<any>) => {
+  fillExtrusionOnMouseMove = (event: MouseEvent<any>) => {
     this.setState({
       marker: event.currentTarget.properties,
     });
   };
 
   render() {
-    const { getColorScheme, onMetricChange, fillExtrusionOnMouseEnter, fillExtrusionOnMouseLeave } = this;
+    const { getColorScheme, onMetricChange, fillExtrusionOnMouseEnter, fillExtrusionOnMouseMove } = this;
     const { metrics, viewOptions, mapJson, metric, showGraph } = this.props;
     const { marker, Map } = this.state;
 
@@ -134,11 +134,12 @@ class MapPanel extends React.Component<Props, State> {
             id="metric"
             fillExtrusionPaint={paint}
             fillExtrusionOnMouseEnter={fillExtrusionOnMouseEnter}
-            fillExtrusionOnMouseLeave={fillExtrusionOnMouseLeave}
+            fillExtrusionOnClick={fillExtrusionOnMouseEnter}
+            fillExtrusionOnMouseMove={fillExtrusionOnMouseMove}
           />
 
           {marker && (
-            <Popup key={marker.name} coordinates={{ lon: marker.longitude, lat: marker.latitude }} offset={marker.height}>
+            <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
               <div style={markerStyle}>{Number(marker.description).toFixed(2)}</div>
             </Popup>
           )}
