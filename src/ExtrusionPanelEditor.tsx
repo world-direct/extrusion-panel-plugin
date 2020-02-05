@@ -1,4 +1,4 @@
-import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
+import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
 import { Options } from './types';
 
@@ -21,13 +21,6 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
-  onApiGraphUriChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.props.onOptionsChange({
-      ...this.props.options,
-      apiGraphUri: event.target.value,
-    });
-  };
-
   onApiUserChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onOptionsChange({
       ...this.props.options,
@@ -42,31 +35,15 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
-  onShowMapChange = () => {
-    this.props.onOptionsChange({
-      ...this.props.options,
-      showMap: !this.props.options.showMap,
-    });
-  };
+  onRadiusChange = (event: ChangeEvent<HTMLInputElement>) => {
+    let radius = Number(event.target.value);
+    if (radius > 200) {
+      radius = 20;
+    }
 
-  onShowGraphChange = () => {
     this.props.onOptionsChange({
       ...this.props.options,
-      showGraph: !this.props.options.showGraph,
-    });
-  };
-
-  onShowLinesChange = () => {
-    this.props.onOptionsChange({
-      ...this.props.options,
-      showLines: !this.props.options.showLines,
-    });
-  };
-
-  onShowPointsChange = () => {
-    this.props.onOptionsChange({
-      ...this.props.options,
-      showPoints: !this.props.options.showPoints,
+      radius: radius,
     });
   };
 
@@ -84,22 +61,26 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
+  onSerialChange = (event: ChangeEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      serial: event.target.value,
+    });
+  };
+
   render() {
     const {
       onApiMapUriChange,
-      onApiGraphUriChange,
       onApiUserChange,
       onApiPasswordChange,
       onAccessTokenChange,
-      onShowMapChange,
-      onShowGraphChange,
-      onShowLinesChange,
-      onShowPointsChange,
+      onRadiusChange,
       onLongitudeChange,
       onLatitudeChange,
+      onSerialChange,
     } = this;
     const { options } = this.props;
-    const { accessToken, apiMapUri, apiGraphUri, apiUser, apiPassword, showGraph, showMap, showLines, showPoints, longitude, latitude } = options;
+    const { accessToken, apiMapUri, apiUser, apiPassword, radius, longitude, latitude, serial } = options;
 
     return (
       <PanelOptionsGrid>
@@ -108,13 +89,13 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
             <FormField label={'Map-Data-Uri'} labelWidth={20} inputWidth={30} onChange={onApiMapUriChange} value={apiMapUri} />
           </div>
           <div className="gf-form">
-            <FormField label={'Graph-Data-Uri'} labelWidth={20} inputWidth={30} onChange={onApiGraphUriChange} value={apiGraphUri} />
-          </div>
-          <div className="gf-form">
             <FormField label={'Basic-Authentication-User'} labelWidth={20} inputWidth={30} onChange={onApiUserChange} value={apiUser} />
           </div>
           <div className="gf-form">
             <FormField label={'Basic-Authentication-Password'} labelWidth={20} inputWidth={30} onChange={onApiPasswordChange} value={apiPassword} />
+          </div>
+          <div className="gf-form">
+            <FormField label="Radius" onChange={onRadiusChange} value={radius} />
           </div>
           <div className="gf-form">
             <FormField label="Longitude" onChange={onLongitudeChange} value={longitude} />
@@ -122,24 +103,13 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
           <div className="gf-form">
             <FormField label="Latitude" onChange={onLatitudeChange} value={latitude} />
           </div>
+          <div className="gf-form">
+            <FormField label="Serial" onChange={onSerialChange} value={serial} />
+          </div>
         </PanelOptionsGroup>
         <PanelOptionsGroup title="Mapbox credentials">
           <div className="gf-form">
             <FormField label={'Access token'} labelWidth={20} inputWidth={30} onChange={onAccessTokenChange} value={accessToken} />
-          </div>
-        </PanelOptionsGroup>
-        <PanelOptionsGroup title="Display options">
-          <div className="gf-form">
-            <Switch label="Show map" checked={showMap} onChange={onShowMapChange} />
-          </div>
-          <div className="gf-form">
-            <Switch label="Show graph" checked={showGraph} onChange={onShowGraphChange} />
-          </div>
-          <div className="gf-form">
-            <Switch label="Show lines" checked={showLines} onChange={onShowLinesChange} />
-          </div>
-          <div className="gf-form">
-            <Switch label="Show points" checked={showPoints} onChange={onShowPointsChange} />
           </div>
         </PanelOptionsGroup>
       </PanelOptionsGrid>

@@ -26,11 +26,15 @@ export class ExtrusionSelect<T> extends Component<Props<T>> {
     }
   };
 
-  getSelectable(object: T): SelectableValue<T> {
+  getSelectable(object: any): SelectableValue<T> {
+    if (object && object.id && object.name) {
+      return { label: object.name, value: object, key: object.id };
+    }
+
     let label = (object as unknown) as string;
     label = label.replace(/([a-z])([A-Z]|[0-9])/g, '$1 $2');
 
-    return { label: label, value: object, key: label };
+    return { text: label, value: object, key: label };
   }
 
   getSelectableOptions = (): Array<SelectableValue<T>> => {
