@@ -1,8 +1,8 @@
-import React, { CSSProperties, MouseEvent } from 'react';
+import React, { CSSProperties } from 'react';
 import ReactMapboxGl, { Popup, GeoJSONLayer } from 'react-mapbox-gl';
-import { ExtrusionSelect } from './ExtrusionSelect';
 import { LegendBox } from './LegendBox';
 import { ColorScheme, Metric, ViewOptions } from './types';
+import { ExtrusionSelect } from 'ExtrusionSelect';
 
 const selectStyle: CSSProperties = {
   width: 200,
@@ -42,7 +42,6 @@ type Props = Readonly<{
   mapJson: object;
   accessToken: string;
   metric: Metric;
-  showGraph: boolean;
 }>;
 
 type State = Readonly<{
@@ -65,7 +64,7 @@ class MapPanel extends React.Component<Props, State> {
 
     let colorScheme = undefined;
     if (colorSchemes) {
-      colorScheme = colorSchemes.find(c => c.metric === metric);
+      colorScheme = colorSchemes.find(c => c.metricId === metric.id);
     }
     return colorScheme;
   };
@@ -76,27 +75,15 @@ class MapPanel extends React.Component<Props, State> {
     onMetricChange(metric);
   };
 
-  fillExtrusionOnMouseEnter = (event: any) => {
+  fillExtrusionOnMouseClick = (event: any) => {
     this.setState({
       marker: event.features[0].properties,
     });
   };
 
-  fillExtrusionOnMouseLeave = () => {
-    this.setState({
-      marker: undefined,
-    });
-  };
-
-  fillExtrusionOnMouseMove = (event: MouseEvent<any>) => {
-    this.setState({
-      marker: event.currentTarget.properties,
-    });
-  };
-
   render() {
-    const { getColorScheme, onMetricChange, fillExtrusionOnMouseEnter, fillExtrusionOnMouseMove } = this;
-    const { metrics, viewOptions, mapJson, metric, showGraph } = this.props;
+    const { getColorScheme, fillExtrusionOnMouseClick, onMetricChange } = this;
+    const { viewOptions, mapJson, metric, metrics } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -118,8 +105,7 @@ class MapPanel extends React.Component<Props, State> {
 
     return (
       <div>
-        {!showGraph && <ExtrusionSelect<Metric> options={metrics} style={selectStyle} onChange={onMetricChange} value={metric} />}
-
+        <ExtrusionSelect<Metric> options={metrics} style={selectStyle} onChange={onMetricChange} value={metric} />
         <Map
           style="mapbox://styles/mapbox/streets-v11"
           center={viewOptions.center}
@@ -133,9 +119,7 @@ class MapPanel extends React.Component<Props, State> {
             type="fill-extrusion"
             id="metric"
             fillExtrusionPaint={paint}
-            fillExtrusionOnMouseEnter={fillExtrusionOnMouseEnter}
-            fillExtrusionOnClick={fillExtrusionOnMouseEnter}
-            fillExtrusionOnMouseMove={fillExtrusionOnMouseMove}
+            fillExtrusionOnClick={fillExtrusionOnMouseClick}
           />
 
           {marker && (

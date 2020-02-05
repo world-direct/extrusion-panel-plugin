@@ -1,92 +1,64 @@
 import { PanelProps } from '@grafana/ui';
 import { LoadingSpinner } from 'LoadingSpinner';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, { PureComponent, CSSProperties } from 'react';
-import GraphPanel from './GraphPanel';
+import React, { PureComponent } from 'react';
 import MapPanel from './MapPanel';
 import { GeoJsonDataState, Metric, Options } from './types';
 import { AbsoluteTimeRange } from '@grafana/data';
 
-const leftContainerStyle: CSSProperties = {
-  width: '50%',
-  position: 'absolute',
-  top: 0,
-  bottom: 0,
-  right: '50%',
-};
-
-const rightContainerStyle: CSSProperties = {
-  width: '50%',
-  position: 'absolute',
-  top: 0,
-  bottom: 0,
-  left: '50%',
-};
+const WAIT_INTERVAL = 2000;
 
 class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
+  timer?: number;
+
   readonly state: GeoJsonDataState = {
     isLoading: false,
     mapJson: {},
-    graphJson: {},
     viewOptions: {},
+    metricOptions: [],
     colorSchemes: [],
-    metric: Metric.ParticulateMatter10,
   };
 
-  getMetricOptions(): Metric[] {
-    const options = new Array<Metric>();
-    for (const metric in Metric) {
-      options.push((Metric[metric] as unknown) as Metric);
-    }
-    return options;
-  }
-
   onMetricChange = (item: Metric) => {
-    const { getMapData, getGraphData } = this;
-    const { showMap, showGraph } = this.props.options;
+    const { getMapData } = this;
 
     this.setState({ metric: item });
 
-    if (showMap) {
-      getMapData(item);
-    }
-    if (showGraph) {
-      getGraphData(item);
-    }
+    getMapData(item);
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>) {
-    const { metric } = this.state;
-    const { getMapData, getGraphData } = this;
+    const { triggerChange } = this;
 
     if (
+      this.props.options.apiMapUri !== prevProps.options.apiMapUri ||
       this.props.options.apiUser !== prevProps.options.apiUser ||
       this.props.options.apiPassword !== prevProps.options.apiPassword ||
       this.props.timeRange.from.unix() !== prevProps.timeRange.from.unix() ||
       this.props.timeRange.to.unix() !== prevProps.timeRange.to.unix() ||
+      this.props.options.radius !== prevProps.options.radius ||
       this.props.options.longitude !== prevProps.options.longitude ||
-      this.props.options.latitude !== prevProps.options.latitude
+      this.props.options.latitude !== prevProps.options.latitude ||
+      this.props.options.serial !== prevProps.options.serial
     ) {
-      getMapData(metric);
-      getGraphData(metric);
-    } else {
-      if (this.props.options.apiMapUri !== prevProps.options.apiMapUri) {
-        getMapData(metric);
-      }
+      clearTimeout(this.timer);
 
-      if (this.props.options.apiGraphUri !== prevProps.options.apiGraphUri) {
-        getGraphData(metric);
-      }
+      this.timer = setTimeout(triggerChange, WAIT_INTERVAL);
     }
   }
 
   componentDidMount() {
-    const { getMapData, getGraphData } = this;
+    const { triggerChange } = this;
+
+    triggerChange();
+  }
+
+  triggerChange = () => {
     const { metric } = this.state;
+    const { getMapData } = this;
 
     getMapData(metric);
-    getGraphData(metric);
-  }
+  };
 
   onHorizontalRegionSelected = (from: number, to: number) => {
     const newTimeRange: AbsoluteTimeRange = {
@@ -98,99 +70,98 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   };
 
   render() {
-    const { getMetricOptions, onMetricChange, onHorizontalRegionSelected } = this;
-    const { timeRange } = this.props;
-    const { accessToken, showGraph, showMap, showLines, showPoints } = this.props.options;
-    const { isLoading, colorSchemes, viewOptions, mapJson, graphJson, metric } = this.state;
+    const { onMetricChange } = this;
+    const { accessToken } = this.props.options;
+    const { isLoading, colorSchemes, viewOptions, mapJson, metric, metricOptions } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
     }
 
-    if (showMap && showGraph) {
-      return (
-        <>
-          <div style={leftContainerStyle}>
-            <MapPanel
-              metrics={getMetricOptions()}
-              onMetricChange={onMetricChange}
-              colorSchemes={colorSchemes}
-              viewOptions={viewOptions}
-              mapJson={mapJson}
-              accessToken={accessToken}
-              metric={metric}
-              showGraph={showGraph}
-            />
-          </div>
-          <div style={rightContainerStyle}>
-            <GraphPanel
-              metrics={getMetricOptions()}
-              onMetricChange={onMetricChange}
-              timeRange={timeRange}
-              graphJson={graphJson}
-              metric={metric}
-              showLines={showLines}
-              showPoints={showPoints}
-              showMap={showMap}
-              onHorizontalRegionSelected={onHorizontalRegionSelected}
-            />
-          </div>
-        </>
-      );
+    if (!metric) {
+      return <p>No metric selected</p>;
     }
 
-    if (showMap) {
-      return (
-        <MapPanel
-          metrics={getMetricOptions()}
-          onMetricChange={onMetricChange}
-          colorSchemes={colorSchemes}
-          viewOptions={viewOptions}
-          mapJson={mapJson}
-          accessToken={accessToken}
-          metric={metric}
-          showGraph={showGraph}
-        />
-      );
-    }
-
-    if (showGraph) {
-      return (
-        <GraphPanel
-          metrics={getMetricOptions()}
-          onMetricChange={onMetricChange}
-          timeRange={timeRange}
-          graphJson={graphJson}
-          metric={metric}
-          showLines={showLines}
-          showPoints={showPoints}
-          showMap={showMap}
-          onHorizontalRegionSelected={onHorizontalRegionSelected}
-        />
-      );
-    }
-
-    return <p>Invalid display option.</p>;
+    return (
+      <MapPanel
+        metrics={metricOptions}
+        onMetricChange={onMetricChange}
+        colorSchemes={colorSchemes}
+        viewOptions={viewOptions}
+        mapJson={mapJson}
+        accessToken={accessToken}
+        metric={metric}
+      />
+    );
   }
 
-  getMapData = (metric: Metric) => {
-    const { apiMapUri, apiUser, apiPassword, longitude, latitude } = this.props.options;
+  getMapData = (metric?: Metric) => {
+    const { fetchMetrics, fetchData } = this;
 
     this.setState({ isLoading: true });
 
+    if (!metric) {
+      fetchMetrics();
+    } else {
+      fetchData();
+    }
+  };
+
+  fetchMetrics = () => {
+    const { fetchData } = this;
+    const { apiMapUri, apiUser, apiPassword } = this.props.options;
+
+    const query = apiMapUri + '/api/AirQuality/metrics';
+
+    fetch(query, {
+      mode: 'cors',
+      headers: new Headers({
+        Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          metricOptions: data,
+          metric: data[0],
+        });
+
+        fetchData();
+      });
+  };
+
+  fetchData = () => {
+    const { metric } = this.state;
+    const { apiMapUri, apiUser, apiPassword, radius, longitude, latitude, serial } = this.props.options;
+
+    if (!metric) {
+      return;
+    }
+
     let query = apiMapUri.concat(
-      '?metric=' +
-        encodeURIComponent(metric.toString()) +
-        '&fromUTC=' +
-        encodeURIComponent(this.props.timeRange.from.unix() + '') +
-        '&toUTC=' +
-        encodeURIComponent(this.props.timeRange.to.unix() + '')
+      '/api/AirQuality/map' +
+        '?from=' +
+        encodeURIComponent(this.props.timeRange.from.valueOf() + '') +
+        '&to=' +
+        encodeURIComponent(this.props.timeRange.to.valueOf() + '') +
+        '&metric=' +
+        encodeURIComponent(metric.id)
     );
 
     if (longitude && latitude) {
       query = query.concat(
-        '&radius=' + encodeURIComponent(20) + '&longitude=' + encodeURIComponent(longitude + '') + '&latitude=' + encodeURIComponent(latitude + '')
+        '&radius=' +
+          encodeURIComponent((radius || 1) * 20) +
+          '&longitude=' +
+          encodeURIComponent(longitude + '') +
+          '&latitude=' +
+          encodeURIComponent(latitude + '')
       );
+    }
+
+    if (serial) {
+      query = query.concat('&serial=' + encodeURIComponent(serial));
     }
 
     fetch(query, {
@@ -207,47 +178,6 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           mapJson: data.geoJson,
           viewOptions: data.viewOptions,
           colorSchemes: data.colorSchemes,
-        })
-      );
-  };
-
-  getGraphData = (metric: Metric) => {
-    const { apiGraphUri, apiUser, apiPassword, longitude, latitude } = this.props.options;
-
-    if (!longitude || !latitude) {
-      this.setState({
-        graphJson: { values: [] },
-      });
-      return;
-    }
-
-    this.setState({ isLoading: true });
-
-    const query = apiGraphUri.concat(
-      '?longitude=' +
-        encodeURIComponent(longitude + '') +
-        '&latitude=' +
-        encodeURIComponent(latitude + '') +
-        '&metric=' +
-        encodeURIComponent(metric.toString()) +
-        '&fromUTC=' +
-        encodeURIComponent(this.props.timeRange.from.unix() + '') +
-        '&toUTC=' +
-        encodeURIComponent(this.props.timeRange.to.unix() + '')
-    );
-
-    fetch(query, {
-      mode: 'cors',
-      headers: new Headers({
-        Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
-        'Content-Type': 'application/json',
-      }),
-    })
-      .then(response => response.json())
-      .then(data =>
-        this.setState({
-          isLoading: false,
-          graphJson: data.graphJson,
         })
       );
   };

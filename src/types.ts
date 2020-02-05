@@ -7,50 +7,37 @@ export interface ViewOptions {
   pitch?: [number];
 }
 
-export enum Metric {
-  ParticulateMatter10 = 'ParticulateMatter10' as any,
-  ParticulateMatter25 = 'ParticulateMatter25' as any,
-  NitrogenDioxide = 'NitrogenDioxide' as any,
-  Ozone = 'Ozone' as any,
-  SulfurDioxide = 'SulfurDioxide' as any,
-  Temperature = 'Temperature' as any,
-  Humidity = 'Humidity' as any,
-  Pressure = 'Pressure' as any,
+export interface Metric {
+  id: number;
+  name: string;
+  unit: string;
 }
 
 export interface GeoJsonDataState {
   isLoading: boolean;
   mapJson: object;
-  graphJson: object;
   viewOptions: ViewOptions;
-  metric: Metric;
+  metricOptions: Metric[];
+  metric?: Metric;
   colorSchemes: ColorScheme[];
 }
 
 export interface Options {
   accessToken: string;
   apiMapUri: string;
-  apiGraphUri: string;
   apiUser: string;
   apiPassword: string;
-  showMap: boolean;
-  showGraph: boolean;
-  showLines: boolean;
-  showPoints: boolean;
+  radius?: number;
   longitude?: number;
   latitude?: number;
+  serial?: string;
 }
 
 export const defaults: Options = {
   accessToken: '<insert access token>',
   apiMapUri: '<set api root-uri>',
-  apiGraphUri: '<set api root-uri>',
   apiUser: '<set api user>',
   apiPassword: '<set api password>',
-  showMap: true,
-  showGraph: false,
-  showLines: true,
-  showPoints: false,
 };
 
 export interface Styles {
@@ -58,7 +45,7 @@ export interface Styles {
 }
 
 export interface ColorScheme {
-  metric: Metric;
+  metricId: number;
   colorRangeItems: ColorRange[];
 }
 
