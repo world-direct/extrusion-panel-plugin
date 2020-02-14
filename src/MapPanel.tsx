@@ -4,6 +4,8 @@ import { LegendBox } from './LegendBox';
 import { ColorScheme, Metric, ViewOptions } from './types';
 import { ExtrusionSelect } from 'ExtrusionSelect';
 
+const WAIT_INTERVAL = 2000;
+
 const selectStyle: CSSProperties = {
   width: 200,
   opacity: 0.8,
@@ -50,11 +52,13 @@ type State = Readonly<{
 }>;
 
 class MapPanel extends React.Component<Props, State> {
+  timer?: number;
+
   state: State = {
     marker: undefined,
     Map: ReactMapboxGl({
-      //minZoom: 2,
-      //maxZoom: 10,
+      minZoom: 12.5,
+      maxZoom: 15.5,
       accessToken: this.props.accessToken,
     }),
   };
@@ -75,14 +79,29 @@ class MapPanel extends React.Component<Props, State> {
     onMetricChange(metric);
   };
 
-  fillExtrusionOnMouseClick = (event: any) => {
+  showMarker = (event: any) => {
+    clearTimeout(this.timer);
+
     this.setState({
       marker: event.features[0].properties,
     });
   };
 
+  hideMarker = () => {
+    this.setState({
+      marker: undefined,
+    });
+  };
+
+  onMouseLeave = () => {
+    const { hideMarker } = this;
+
+    clearTimeout(this.timer);
+    this.timer = window.setTimeout(hideMarker, WAIT_INTERVAL);
+  };
+
   render() {
-    const { getColorScheme, fillExtrusionOnMouseClick, onMetricChange } = this;
+    const { getColorScheme, showMarker, onMouseLeave, onMetricChange } = this;
     const { viewOptions, mapJson, metric, metrics } = this.props;
     const { marker, Map } = this.state;
 
@@ -119,12 +138,13 @@ class MapPanel extends React.Component<Props, State> {
             type="fill-extrusion"
             id="metric"
             fillExtrusionPaint={paint}
-            fillExtrusionOnClick={fillExtrusionOnMouseClick}
+            fillExtrusionOnMouseMove={showMarker}
+            fillExtrusionOnMouseLeave={onMouseLeave}
           />
 
           {marker && (
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
-              <div style={markerStyle}>{Number(marker.description).toFixed(2)}</div>
+              <div style={markerStyle}>{Number(marker.description.replace(',', '.')).toFixed(2)}</div>
             </Popup>
           )}
         </Map>

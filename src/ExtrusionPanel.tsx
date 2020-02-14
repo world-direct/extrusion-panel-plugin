@@ -43,7 +43,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     ) {
       clearTimeout(this.timer);
 
-      this.timer = setTimeout(triggerChange, WAIT_INTERVAL);
+      this.timer = window.setTimeout(triggerChange, WAIT_INTERVAL);
     }
   }
 
