@@ -132,6 +132,7 @@ class MapPanel extends React.Component<Props, State> {
           pitch={viewOptions.pitch}
           bearing={viewOptions.bearing}
           containerStyle={containerStyle}
+          movingMethod="easeTo"
         >
           <GeoJSONLayer
             data={mapJson}
