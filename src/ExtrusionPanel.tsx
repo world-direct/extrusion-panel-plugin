@@ -43,7 +43,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     ) {
       clearTimeout(this.timer);
 
-      this.timer = setTimeout(triggerChange, WAIT_INTERVAL);
+      this.timer = window.setTimeout(triggerChange, WAIT_INTERVAL);
     }
   }
 
@@ -103,7 +103,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     if (!metric) {
       fetchMetrics();
     } else {
-      fetchData();
+      fetchData(metric);
     }
   };
 
@@ -131,9 +131,12 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       });
   };
 
-  fetchData = () => {
-    const { metric } = this.state;
+  fetchData = (metric?: Metric) => {
     const { apiMapUri, apiUser, apiPassword, radius, longitude, latitude, serial } = this.props.options;
+
+    if (!metric) {
+      metric = this.state.metric;
+    }
 
     if (!metric) {
       return;
