@@ -4,3 +4,4 @@ import ExtrusionPanelEditor from './ExtrusionPanelEditor';
 import { defaults } from './types';
 
 export const plugin = new PanelPlugin(ExtrusionPanel).setDefaults(defaults).setEditor(ExtrusionPanelEditor);
+//setPanelChangeHandler();

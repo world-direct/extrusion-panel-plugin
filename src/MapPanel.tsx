@@ -1,20 +1,9 @@
 import React, { CSSProperties } from 'react';
 import ReactMapboxGl, { Popup, GeoJSONLayer } from 'react-mapbox-gl';
 import { LegendBox } from './LegendBox';
-import { ColorScheme, Metric, ViewOptions } from './types';
-import { ExtrusionSelect } from 'ExtrusionSelect';
+import { ColorScheme, ViewOptions } from './types';
 
 const WAIT_INTERVAL = 2000;
-
-const selectStyle: CSSProperties = {
-  width: 200,
-  opacity: 0.8,
-  position: 'absolute',
-  top: 8,
-  left: 2,
-  zIndex: 1,
-  boxShadow: '2px 2px #888',
-};
 
 const containerStyle: CSSProperties = {
   position: 'absolute',
@@ -37,13 +26,11 @@ type PropertyType = {
 };
 
 type Props = Readonly<{
-  metrics: Metric[];
-  onMetricChange: (item: Metric) => void;
   colorSchemes: ColorScheme[];
   viewOptions: ViewOptions;
   mapJson: object;
   accessToken: string;
-  metric: Metric;
+  metric: number;
 }>;
 
 type State = Readonly<{
@@ -68,15 +55,9 @@ class MapPanel extends React.Component<Props, State> {
 
     let colorScheme = undefined;
     if (colorSchemes) {
-      colorScheme = colorSchemes.find(c => c.metricId === metric.id);
+      colorScheme = colorSchemes.find(c => c.metricId === metric);
     }
     return colorScheme;
-  };
-
-  onMetricChange = (metric: Metric) => {
-    const { onMetricChange } = this.props;
-
-    onMetricChange(metric);
   };
 
   showMarker = (event: any) => {
@@ -101,8 +82,8 @@ class MapPanel extends React.Component<Props, State> {
   };
 
   render() {
-    const { getColorScheme, showMarker, onMouseLeave, onMetricChange } = this;
-    const { viewOptions, mapJson, metric, metrics } = this.props;
+    const { getColorScheme, showMarker, onMouseLeave } = this;
+    const { viewOptions, mapJson } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -124,7 +105,6 @@ class MapPanel extends React.Component<Props, State> {
 
     return (
       <div>
-        <ExtrusionSelect<Metric> options={metrics} style={selectStyle} onChange={onMetricChange} value={metric} />
         <Map
           style="mapbox://styles/mapbox/streets-v11"
           center={viewOptions.center}
