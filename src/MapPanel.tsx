@@ -100,7 +100,7 @@ class MapPanel extends React.Component<Props, State> {
       'fill-extrusion-base': ['get', 'base_height'],
 
       // Make extrusions slightly opaque for see through indoor walls.
-      'fill-extrusion-opacity': 0.5,
+      'fill-extrusion-opacity': 0.7,
     };
 
     return (
