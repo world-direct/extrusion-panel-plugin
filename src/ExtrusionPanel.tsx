@@ -125,7 +125,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     }
 
     let query = apiMapUri.concat(
-      '/api/AirQuality/map' +
+      '/api/Measurments/map' +
         '?from=' +
         encodeURIComponent(this.props.timeRange.from.valueOf() + '') +
         '&to=' +
