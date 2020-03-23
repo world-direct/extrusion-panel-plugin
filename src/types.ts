@@ -7,18 +7,10 @@ export interface ViewOptions {
   pitch?: [number];
 }
 
-export interface Metric {
-  id: number;
-  name: string;
-  unit: string;
-}
-
 export interface GeoJsonDataState {
   isLoading: boolean;
   mapJson: object;
   viewOptions: ViewOptions;
-  metricOptions: Metric[];
-  metric?: Metric;
   colorSchemes: ColorScheme[];
 }
 
@@ -28,9 +20,6 @@ export interface Options {
   apiUser: string;
   apiPassword: string;
   radius?: number;
-  longitude?: number;
-  latitude?: number;
-  serial?: string;
 }
 
 export const defaults: Options = {
@@ -53,10 +42,4 @@ export interface ColorRange {
   fromInclusive?: number | null;
   toExclusive?: number | null;
   color: string;
-}
-
-export interface VirtualLocation {
-  name?: string;
-  longitude?: number;
-  latitude?: number;
 }
