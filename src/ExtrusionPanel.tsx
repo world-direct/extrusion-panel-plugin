@@ -16,6 +16,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     mapJson: {},
     viewOptions: {},
     colorSchemes: [],
+    locations: [],
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>) {
@@ -58,7 +59,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
   render() {
     const { accessToken } = this.props.options;
-    const { isLoading, colorSchemes, viewOptions, mapJson } = this.state;
+    const { isLoading, colorSchemes, viewOptions, mapJson, locations } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -79,7 +80,16 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       return <p>No metric selected</p>;
     }
 
-    return <MapPanel colorSchemes={colorSchemes} viewOptions={viewOptions} mapJson={mapJson} accessToken={accessToken} metric={Number(metric)} />;
+    return (
+      <MapPanel
+        colorSchemes={colorSchemes}
+        viewOptions={viewOptions}
+        mapJson={mapJson}
+        accessToken={accessToken}
+        metric={Number(metric)}
+        locations={locations}
+      />
+    );
   }
 
   getMapData = () => {
@@ -97,6 +107,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     let radius = null;
     let longitude = null;
     let latitude = null;
+    let location = null;
+    let square = null;
     let serial = null;
 
     if (this.props.data.series != null && this.props.data.series.length > 0) {
@@ -115,6 +127,12 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
               break;
             case 'latitude':
               latitude = value;
+              break;
+            case 'location':
+              location = value;
+              break;
+            case 'square':
+              square = value;
               break;
             case 'serial':
               serial = value;
@@ -144,6 +162,14 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       query = query.concat('&longitude=' + encodeURIComponent(longitude + '') + '&latitude=' + encodeURIComponent(latitude + ''));
     }
 
+    if (location) {
+      query = query.concat('&location=' + encodeURIComponent(location));
+    }
+
+    if (square) {
+      query = query.concat('&square=' + encodeURIComponent(square));
+    }
+
     if (serial) {
       query = query.concat('&serial=' + encodeURIComponent(serial));
     }
@@ -162,6 +188,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           mapJson: data.geoJson,
           viewOptions: data.viewOptions,
           colorSchemes: data.colorSchemes,
+          locations: data.virtualLocations,
         })
       );
   };
