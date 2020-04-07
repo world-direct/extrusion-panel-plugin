@@ -58,7 +58,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   };
 
   render() {
-    const { accessToken } = this.props.options;
+    const { accessToken, showLocations } = this.props.options;
     const { isLoading, colorSchemes, viewOptions, mapJson, locations } = this.state;
 
     if (isLoading) {
@@ -88,6 +88,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         accessToken={accessToken}
         metric={Number(metric)}
         locations={locations}
+        showLocations={showLocations}
       />
     );
   }

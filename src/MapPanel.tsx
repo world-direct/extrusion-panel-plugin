@@ -39,6 +39,7 @@ type Props = Readonly<{
   accessToken: string;
   metric: number;
   locations: VirtualLocation[];
+  showLocations: boolean;
 }>;
 
 type State = Readonly<{
@@ -91,7 +92,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson, locations } = this.props;
+    const { viewOptions, mapJson, locations, showLocations } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -131,18 +132,19 @@ class MapPanel extends React.Component<Props, State> {
             fillExtrusionOnMouseLeave={onMouseLeave}
           />
 
-          {locations.map(value => (
-            <Marker coordinates={[value.longitude, value.latitude]} anchor="bottom">
-              <div style={markerStyle}>
-                {!value.link && <>{value.name}</>}
-                {value.link && (
-                  <a style={markerLinkStyle} href={value.link} target="_blank">
-                    {value.name}
-                  </a>
-                )}
-              </div>
-            </Marker>
-          ))}
+          {showLocations &&
+            locations.map(value => (
+              <Marker coordinates={[value.longitude, value.latitude]} anchor="bottom">
+                <div style={markerStyle}>
+                  {!value.link && <>{value.name}</>}
+                  {value.link && (
+                    <a style={markerLinkStyle} href={value.link} target="_blank">
+                      {value.name}
+                    </a>
+                  )}
+                </div>
+              </Marker>
+            ))}
 
           {marker && (
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
