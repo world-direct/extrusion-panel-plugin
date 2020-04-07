@@ -1,4 +1,4 @@
-import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup } from '@grafana/ui';
+import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
 import { Options } from './types';
 
@@ -35,10 +35,17 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
+  onShowLocationChange = (event?: React.SyntheticEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      showLocations: !this.props.options.showLocations,
+    });
+  };
+
   render() {
-    const { onApiMapUriChange, onApiUserChange, onApiPasswordChange, onAccessTokenChange } = this;
+    const { onApiMapUriChange, onApiUserChange, onApiPasswordChange, onAccessTokenChange, onShowLocationChange } = this;
     const { options } = this.props;
-    const { accessToken, apiMapUri, apiUser, apiPassword } = options;
+    const { accessToken, apiMapUri, apiUser, apiPassword, showLocations } = options;
 
     return (
       <PanelOptionsGrid>
@@ -56,6 +63,11 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
         <PanelOptionsGroup title="Mapbox credentials">
           <div className="gf-form">
             <FormField label={'Access token'} labelWidth={20} inputWidth={30} onChange={onAccessTokenChange} value={accessToken} />
+          </div>
+        </PanelOptionsGroup>
+        <PanelOptionsGroup title="Settings">
+          <div className="gf-form">
+            <Switch label={'Show locations'} onChange={onShowLocationChange} checked={showLocations} />
           </div>
         </PanelOptionsGroup>
       </PanelOptionsGrid>

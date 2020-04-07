@@ -12,6 +12,7 @@ export interface GeoJsonDataState {
   mapJson: object;
   viewOptions: ViewOptions;
   colorSchemes: ColorScheme[];
+  locations: VirtualLocation[];
 }
 
 export interface Options {
@@ -19,7 +20,7 @@ export interface Options {
   apiMapUri: string;
   apiUser: string;
   apiPassword: string;
-  radius?: number;
+  showLocations: boolean;
 }
 
 export const defaults: Options = {
@@ -27,6 +28,7 @@ export const defaults: Options = {
   apiMapUri: '<set api root-uri>',
   apiUser: '<set api user>',
   apiPassword: '<set api password>',
+  showLocations: true,
 };
 
 export interface Styles {
@@ -42,4 +44,11 @@ export interface ColorRange {
   fromInclusive?: number | null;
   toExclusive?: number | null;
   color: string;
+}
+
+export interface VirtualLocation {
+  name: string;
+  longitude: number;
+  latitude: number;
+  link?: string;
 }

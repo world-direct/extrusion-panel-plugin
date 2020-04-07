@@ -1,9 +1,9 @@
 import React, { CSSProperties } from 'react';
-import ReactMapboxGl, { Popup, GeoJSONLayer } from 'react-mapbox-gl';
+import ReactMapboxGl, { Popup, GeoJSONLayer, Marker } from 'react-mapbox-gl';
 import { LegendBox } from './LegendBox';
-import { ColorScheme, ViewOptions } from './types';
+import { ColorScheme, ViewOptions, VirtualLocation } from './types';
 
-const WAIT_INTERVAL = 2000;
+const WAIT_INTERVAL = 1000;
 
 const containerStyle: CSSProperties = {
   position: 'absolute',
@@ -14,6 +14,13 @@ const containerStyle: CSSProperties = {
 };
 
 const markerStyle: CSSProperties = {
+  color: '#000',
+  padding: '5px',
+  background: '#fff',
+  borderRadius: '4px',
+};
+
+const markerLinkStyle: CSSProperties = {
   color: '#000',
 };
 
@@ -31,6 +38,8 @@ type Props = Readonly<{
   mapJson: object;
   accessToken: string;
   metric: number;
+  locations: VirtualLocation[];
+  showLocations: boolean;
 }>;
 
 type State = Readonly<{
@@ -83,7 +92,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson } = this.props;
+    const { viewOptions, mapJson, locations, showLocations } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -123,9 +132,27 @@ class MapPanel extends React.Component<Props, State> {
             fillExtrusionOnMouseLeave={onMouseLeave}
           />
 
+          {showLocations &&
+            locations.map(value => (
+              <Marker coordinates={[value.longitude, value.latitude]} anchor="bottom">
+                <div style={markerStyle}>
+                  {!value.link && <>{value.name}</>}
+                  {value.link && (
+                    <a style={markerLinkStyle} href={value.link} target="_blank">
+                      {value.name}
+                    </a>
+                  )}
+                </div>
+              </Marker>
+            ))}
+
           {marker && (
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
-              <div style={markerStyle}>{Number(marker.description.replace(',', '.')).toFixed(2)}</div>
+              <div>
+                <a style={markerLinkStyle} href="/d/Monitor/monitor" target="_blank">
+                  {Number(marker.description.replace(',', '.')).toFixed(2)}
+                </a>
+              </div>
             </Popup>
           )}
         </Map>
