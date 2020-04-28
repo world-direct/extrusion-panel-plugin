@@ -42,10 +42,17 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
     });
   };
 
+  onFlatMapChange = (event?: React.SyntheticEvent<HTMLInputElement>) => {
+    this.props.onOptionsChange({
+      ...this.props.options,
+      flatMap: !this.props.options.flatMap,
+    });
+  };
+
   render() {
-    const { onApiMapUriChange, onApiUserChange, onApiPasswordChange, onAccessTokenChange, onShowLocationChange } = this;
+    const { onApiMapUriChange, onApiUserChange, onApiPasswordChange, onAccessTokenChange, onShowLocationChange, onFlatMapChange } = this;
     const { options } = this.props;
-    const { accessToken, apiMapUri, apiUser, apiPassword, showLocations } = options;
+    const { accessToken, apiMapUri, apiUser, apiPassword, showLocations, flatMap } = options;
 
     return (
       <PanelOptionsGrid>
@@ -68,6 +75,9 @@ class ExtrusionPanelEditor extends PureComponent<PanelEditorProps<Options>> {
         <PanelOptionsGroup title="Settings">
           <div className="gf-form">
             <Switch label={'Show locations'} onChange={onShowLocationChange} checked={showLocations} />
+          </div>
+          <div className="gf-form">
+            <Switch label={'Flat map'} onChange={onFlatMapChange} checked={flatMap} />
           </div>
         </PanelOptionsGroup>
       </PanelOptionsGrid>

@@ -26,6 +26,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       this.props.options.apiMapUri !== prevProps.options.apiMapUri ||
       this.props.options.apiUser !== prevProps.options.apiUser ||
       this.props.options.apiPassword !== prevProps.options.apiPassword ||
+      this.props.options.showLocations !== prevProps.options.showLocations ||
+      this.props.options.flatMap !== prevProps.options.flatMap ||
       this.props.timeRange.from.unix() !== prevProps.timeRange.from.unix() ||
       this.props.timeRange.to.unix() !== prevProps.timeRange.to.unix() ||
       this.props.data !== prevProps.data
@@ -58,7 +60,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   };
 
   render() {
-    const { accessToken, showLocations } = this.props.options;
+    const { accessToken, showLocations, flatMap } = this.props.options;
     const { isLoading, colorSchemes, viewOptions, mapJson, locations } = this.state;
 
     if (isLoading) {
@@ -89,6 +91,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         metric={Number(metric)}
         locations={locations}
         showLocations={showLocations}
+        flatMap={flatMap}
       />
     );
   }
@@ -102,7 +105,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   };
 
   fetchData = () => {
-    const { apiMapUri, apiUser, apiPassword } = this.props.options;
+    const { apiMapUri, apiUser, apiPassword, flatMap } = this.props.options;
 
     let metric = null;
     let radius = null;
@@ -173,6 +176,10 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
     if (serial) {
       query = query.concat('&serial=' + encodeURIComponent(serial));
+    }
+
+    if (flatMap) {
+      query = query.concat('&flat=true');
     }
 
     fetch(query, {

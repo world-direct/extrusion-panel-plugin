@@ -40,6 +40,7 @@ type Props = Readonly<{
   metric: number;
   locations: VirtualLocation[];
   showLocations: boolean;
+  flatMap: boolean;
 }>;
 
 type State = Readonly<{
@@ -92,7 +93,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson, locations, showLocations } = this.props;
+    const { viewOptions, mapJson, locations, showLocations, flatMap } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -150,13 +151,13 @@ class MapPanel extends React.Component<Props, State> {
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
               <div>
                 <a style={markerLinkStyle} href="/d/Monitor/monitor" target="_blank">
-                  {Number(marker.description.replace(',', '.')).toFixed(2)}
+                  {marker.description}
                 </a>
               </div>
             </Popup>
           )}
         </Map>
-        <LegendBox colorScheme={getColorScheme()} />
+        {!flatMap && <LegendBox colorScheme={getColorScheme()} />}
       </div>
     );
   }

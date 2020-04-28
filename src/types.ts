@@ -21,6 +21,7 @@ export interface Options {
   apiUser: string;
   apiPassword: string;
   showLocations: boolean;
+  flatMap: boolean;
 }
 
 export const defaults: Options = {
@@ -29,6 +30,7 @@ export const defaults: Options = {
   apiUser: '<set api user>',
   apiPassword: '<set api password>',
   showLocations: true,
+  flatMap: false,
 };
 
 export interface Styles {

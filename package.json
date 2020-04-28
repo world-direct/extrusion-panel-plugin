@@ -14,11 +14,11 @@
     "@grafana/data": "6.4.0",
     "@grafana/toolkit": "6.4.0",
     "@grafana/ui": "6.4.0",
-    "react-mapbox-gl": "4.6.0",
-    "mapbox-gl": "1.2.1"
+    "mapbox-gl": "1.2.1",
+    "react-mapbox-gl": "4.6.0"
   },
   "dependencies": {
-    "react-mapbox-gl": "4.6.0",
-    "mapbox-gl": "1.2.1"
+    "mapbox-gl": "1.2.1",
+    "react-mapbox-gl": "4.6.0"
   }
 }
