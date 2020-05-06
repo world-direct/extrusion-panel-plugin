@@ -1,4 +1,3 @@
-
 import { PanelEditorProps } from '@grafana/data';
 import { FormField, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';

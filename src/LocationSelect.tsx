@@ -41,7 +41,7 @@ export class LocationSelect extends Component<Props> {
     const { getSelectable } = this;
     const { options } = this.props;
 
-    const selectableOptions = new Array<SelectableValue<VirtualLocation>>();
+    const selectableOptions: SelectableValue<VirtualLocation>[] = [];
 
     options.map(m => {
       selectableOptions.push(getSelectable(m));
