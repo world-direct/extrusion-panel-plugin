@@ -41,7 +41,7 @@ export class ExtrusionSelect<T> extends Component<Props<T>> {
     const { getSelectable } = this;
     const { options } = this.props;
 
-    const selectableOptions: SelectableValue<T>[] = [];
+    const selectableOptions: Array<SelectableValue<T>> = [];
 
     options.map(m => {
       selectableOptions.push(getSelectable(m));
