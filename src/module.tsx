@@ -1,4 +1,4 @@
-import { PanelPlugin } from '@grafana/ui';
+import { PanelPlugin } from '@grafana/data';
 import ExtrusionPanel from './ExtrusionPanel';
 import ExtrusionPanelEditor from './ExtrusionPanelEditor';
 import { defaults } from './types';

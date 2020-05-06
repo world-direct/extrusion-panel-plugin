@@ -1,4 +1,6 @@
-import { FormField, PanelEditorProps, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
+
+import { PanelEditorProps } from '@grafana/data';
+import { FormField, PanelOptionsGrid, PanelOptionsGroup, Switch } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
 import { Options } from './types';
 

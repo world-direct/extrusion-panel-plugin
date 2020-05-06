@@ -1,5 +1,4 @@
-import { AbsoluteTimeRange } from '@grafana/data';
-import { PanelProps } from '@grafana/ui';
+import { AbsoluteTimeRange, PanelProps } from '@grafana/data';
 import { LoadingSpinner } from 'LoadingSpinner';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { PureComponent } from 'react';
