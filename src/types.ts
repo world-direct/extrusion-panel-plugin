@@ -12,6 +12,7 @@ export interface GeoJsonDataState {
   mapJson: object;
   viewOptions: ViewOptions;
   colorSchemes: ColorScheme[];
+  colorItems: ColorItem[];
   locations: VirtualLocation[];
 }
 
@@ -45,6 +46,11 @@ export interface ColorScheme {
 export interface ColorRange {
   fromInclusive?: number | null;
   toExclusive?: number | null;
+  color: string;
+}
+
+export interface ColorItem {
+  serial: string;
   color: string;
 }
 

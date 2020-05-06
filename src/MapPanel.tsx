@@ -1,7 +1,8 @@
 import React, { CSSProperties } from 'react';
-import ReactMapboxGl, { Popup, GeoJSONLayer, Marker } from 'react-mapbox-gl';
+import ReactMapboxGl, { GeoJSONLayer, Marker, Popup } from 'react-mapbox-gl';
 import { LegendBox } from './LegendBox';
-import { ColorScheme, ViewOptions, VirtualLocation } from './types';
+import { SerialColorBox } from './SerialColorBox';
+import { ColorItem, ColorScheme, ViewOptions, VirtualLocation } from './types';
 
 const WAIT_INTERVAL = 1000;
 
@@ -34,6 +35,7 @@ type PropertyType = {
 
 type Props = Readonly<{
   colorSchemes: ColorScheme[];
+  colorItems: ColorItem[];
   viewOptions: ViewOptions;
   mapJson: object;
   accessToken: string;
@@ -93,7 +95,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson, locations, showLocations, flatMap } = this.props;
+    const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -151,13 +153,13 @@ class MapPanel extends React.Component<Props, State> {
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
               <div>
                 <a style={markerLinkStyle} href="/d/Monitor/monitor" target="_blank">
-                  {marker.description}
+                  {isNaN(Number(marker.description)) ? marker.description : Number(marker.description).toFixed(2)}
                 </a>
               </div>
             </Popup>
           )}
         </Map>
-        {!flatMap && <LegendBox colorScheme={getColorScheme()} />}
+        {flatMap ? <SerialColorBox colorItems={colorItems} /> : <LegendBox colorScheme={getColorScheme()} />}
       </div>
     );
   }

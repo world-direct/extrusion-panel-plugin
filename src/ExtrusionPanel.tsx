@@ -1,10 +1,10 @@
+import { AbsoluteTimeRange } from '@grafana/data';
 import { PanelProps } from '@grafana/ui';
 import { LoadingSpinner } from 'LoadingSpinner';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { PureComponent } from 'react';
 import MapPanel from './MapPanel';
 import { GeoJsonDataState, Options } from './types';
-import { AbsoluteTimeRange } from '@grafana/data';
 
 const WAIT_INTERVAL = 2000;
 
@@ -16,6 +16,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     mapJson: {},
     viewOptions: {},
     colorSchemes: [],
+    colorItems: [],
     locations: [],
   };
 
@@ -61,7 +62,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
   render() {
     const { accessToken, showLocations, flatMap } = this.props.options;
-    const { isLoading, colorSchemes, viewOptions, mapJson, locations } = this.state;
+    const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -85,6 +86,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     return (
       <MapPanel
         colorSchemes={colorSchemes}
+        colorItems={colorItems}
         viewOptions={viewOptions}
         mapJson={mapJson}
         accessToken={accessToken}
@@ -196,6 +198,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           mapJson: data.geoJson,
           viewOptions: data.viewOptions,
           colorSchemes: data.colorSchemes,
+          colorItems: data.serialColorItems,
           locations: data.virtualLocations,
         })
       );
