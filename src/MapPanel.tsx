@@ -117,14 +117,13 @@ class MapPanel extends React.Component<Props, State> {
 
     let markerContent = <></>;
 
-    if(marker) {
+    if (marker) {
       var numberMarker = Number(marker.description.replace(',', '.'));
 
-      if(isNaN(numberMarker)) {
-        markerContent = <>{marker.description}</>
-      }
-      else {
-        markerContent = <>{numberMarker.toFixed(2)}</>
+      if (isNaN(numberMarker)) {
+        markerContent = <>{marker.description}</>;
+      } else {
+        markerContent = <>{numberMarker.toFixed(2)}</>;
       }
     }
 
