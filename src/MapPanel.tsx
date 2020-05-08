@@ -115,6 +115,19 @@ class MapPanel extends React.Component<Props, State> {
       'fill-extrusion-opacity': 0.7,
     };
 
+    let markerContent = <></>;
+
+    if(marker) {
+      var numberMarker = Number(marker.description.replace(',', '.'));
+
+      if(isNaN(numberMarker)) {
+        markerContent = <>{marker.description}</>
+      }
+      else {
+        markerContent = <>{numberMarker.toFixed(2)}</>
+      }
+    }
+
     return (
       <div>
         <Map
@@ -153,7 +166,7 @@ class MapPanel extends React.Component<Props, State> {
             <Popup key={marker.name} coordinates={[marker.longitude, marker.latitude, marker.height]}>
               <div>
                 <a style={markerLinkStyle} href="/d/Monitor/monitor" target="_blank">
-                  {isNaN(Number(marker.description)) ? marker.description : Number(marker.description).toFixed(2)}
+                  {markerContent}
                 </a>
               </div>
             </Popup>
