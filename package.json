@@ -14,12 +14,12 @@
     "@grafana/data": "6.7.3",
     "@grafana/toolkit": "^6.7.3",
     "@grafana/ui": "^6.7.3",
-    "mapbox-gl": "1.10.0",
+    "mapbox-gl": "1.10.1",
     "react-mapbox-gl": "4.8.3",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.3"
   },
   "dependencies": {
-    "mapbox-gl": "1.10.0",
+    "mapbox-gl": "1.10.1",
     "react-mapbox-gl": "4.8.3",
     "ts-build": "^0.2.0"
   }
