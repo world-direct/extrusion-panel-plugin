@@ -65,7 +65,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     const { dynamic } = this.state;
 
     this.setState({ dynamic: !dynamic });
-  }
+  };
 
   render() {
     const { switchColorScheme } = this;
