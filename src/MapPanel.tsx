@@ -25,6 +25,27 @@ const markerLinkStyle: CSSProperties = {
   color: '#000',
 };
 
+const toggleContainerStyle: CSSProperties = {
+  zIndex: 1,
+  position: 'absolute',
+  top: 10,
+  left: 5,
+  width: 100,
+  background: '#fff',
+  padding: 4,
+  opacity: 0.8,
+};
+
+const toggleButtonStyle: CSSProperties = {
+  width: '100%',
+  color: '#fff',
+  backgroundColor: 'rgb(110, 170, 240)',
+  padding: '0px 2px',
+  textShadow: '1px 1px #888',
+  boxShadow: '2px 2px #888',
+  border: 'none',
+};
+
 type PropertyType = {
   name: string;
   description: string;
@@ -43,6 +64,7 @@ type Props = Readonly<{
   locations: VirtualLocation[];
   showLocations: boolean;
   flatMap: boolean;
+  switchColorScheme: () => void;
 }>;
 
 type State = Readonly<{
@@ -95,7 +117,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems } = this.props;
+    const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems, switchColorScheme, metric } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -172,6 +194,11 @@ class MapPanel extends React.Component<Props, State> {
           )}
         </Map>
         {flatMap ? <SerialColorBox colorItems={colorItems} /> : <LegendBox colorScheme={getColorScheme()} />}
+        {metric === 1 &&
+          <div style={toggleContainerStyle}>
+            <button onClick={switchColorScheme} style={toggleButtonStyle}>Toggle</button>
+          </div>
+        }
       </div>
     );
   }

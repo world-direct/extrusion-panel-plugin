@@ -14,6 +14,7 @@ export interface GeoJsonDataState {
   colorSchemes: ColorScheme[];
   colorItems: ColorItem[];
   locations: VirtualLocation[];
+  dynamic: boolean;
 }
 
 export interface Options {

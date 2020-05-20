@@ -17,9 +17,10 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     colorSchemes: [],
     colorItems: [],
     locations: [],
+    dynamic: true,
   };
 
-  componentDidUpdate(prevProps: PanelProps<Options>) {
+  componentDidUpdate(prevProps: PanelProps<Options>, prevState: GeoJsonDataState) {
     const { triggerChange } = this;
 
     if (
@@ -30,7 +31,8 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
       this.props.options.flatMap !== prevProps.options.flatMap ||
       this.props.timeRange.from.unix() !== prevProps.timeRange.from.unix() ||
       this.props.timeRange.to.unix() !== prevProps.timeRange.to.unix() ||
-      this.props.data !== prevProps.data
+      this.props.data !== prevProps.data ||
+      this.state.dynamic !== prevState.dynamic
     ) {
       clearTimeout(this.timer);
 
@@ -59,7 +61,14 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     this.props.onChangeTimeRange(newTimeRange);
   };
 
+  switchColorScheme = () => {
+    const { dynamic } = this.state;
+
+    this.setState({ dynamic: !dynamic });
+  }
+
   render() {
+    const { switchColorScheme } = this;
     const { accessToken, showLocations, flatMap } = this.props.options;
     const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations } = this.state;
 
@@ -93,6 +102,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         locations={locations}
         showLocations={showLocations}
         flatMap={flatMap}
+        switchColorScheme={switchColorScheme}
       />
     );
   }
@@ -107,6 +117,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
   fetchData = () => {
     const { apiMapUri, apiUser, apiPassword, flatMap } = this.props.options;
+    const { dynamic } = this.state;
 
     let metric = null;
     let radius = null;
@@ -181,6 +192,10 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
     if (flatMap) {
       query = query.concat('&flat=true');
+    }
+
+    if (!dynamic) {
+      query = query.concat('&dynamic=false');
     }
 
     fetch(query, {
