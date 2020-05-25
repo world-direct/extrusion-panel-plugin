@@ -70,7 +70,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   render() {
     const { switchColorScheme } = this;
     const { accessToken, showLocations, flatMap } = this.props.options;
-    const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations } = this.state;
+    const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations, dynamic } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -102,6 +102,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         locations={locations}
         showLocations={showLocations}
         flatMap={flatMap}
+        dynamic={dynamic}
         switchColorScheme={switchColorScheme}
       />
     );

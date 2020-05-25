@@ -64,6 +64,7 @@ type Props = Readonly<{
   locations: VirtualLocation[];
   showLocations: boolean;
   flatMap: boolean;
+  dynamic: boolean;
   switchColorScheme: () => void;
 }>;
 
@@ -117,7 +118,7 @@ class MapPanel extends React.Component<Props, State> {
 
   render() {
     const { getColorScheme, showMarker, onMouseLeave } = this;
-    const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems, switchColorScheme, metric } = this.props;
+    const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems, switchColorScheme, metric, dynamic } = this.props;
     const { marker, Map } = this.state;
 
     const paint = {
@@ -197,7 +198,7 @@ class MapPanel extends React.Component<Props, State> {
         {!flatMap && metric === 1 && (
           <div style={toggleContainerStyle}>
             <button onClick={switchColorScheme} style={toggleButtonStyle}>
-              Toggle
+              {dynamic ? 'Wechsel Jahreszeiten' : 'Wechsel Dynamisch'}
             </button>
           </div>
         )}
