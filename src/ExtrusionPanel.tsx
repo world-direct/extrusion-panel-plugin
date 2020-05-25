@@ -17,7 +17,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     colorSchemes: [],
     colorItems: [],
     locations: [],
-    dynamic: true,
+    dynamic: false,
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>, prevState: GeoJsonDataState) {
