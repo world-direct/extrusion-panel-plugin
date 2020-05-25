@@ -194,7 +194,7 @@ class MapPanel extends React.Component<Props, State> {
           )}
         </Map>
         {flatMap ? <SerialColorBox colorItems={colorItems} /> : <LegendBox colorScheme={getColorScheme()} />}
-        {metric === 1 && (
+        {!flatMap && metric === 1 && (
           <div style={toggleContainerStyle}>
             <button onClick={switchColorScheme} style={toggleButtonStyle}>
               Toggle
