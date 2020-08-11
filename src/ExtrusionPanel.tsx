@@ -18,6 +18,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     colorItems: [],
     locations: [],
     dynamic: false,
+    metrics: [],
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>, prevState: GeoJsonDataState) {
@@ -70,7 +71,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   render() {
     const { switchColorScheme } = this;
     const { accessToken, showLocations, flatMap } = this.props.options;
-    const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations, dynamic } = this.state;
+    const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations, dynamic, metrics } = this.state;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -99,6 +100,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         mapJson={mapJson}
         accessToken={accessToken}
         metric={Number(metric)}
+        metrics={metrics}
         locations={locations}
         showLocations={showLocations}
         flatMap={flatMap}
@@ -109,11 +111,12 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
   }
 
   getMapData = () => {
-    const { fetchData } = this;
+    const { fetchData, fetchMetrics } = this;
 
     this.setState({ isLoading: true });
 
     fetchData();
+    fetchMetrics();
   };
 
   fetchData = () => {
@@ -206,17 +209,39 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         'Content-Type': 'application/json',
       }),
     })
-      .then(response => response.json())
-      .then(data =>
-        this.setState({
-          isLoading: false,
-          mapJson: data.geoJson,
-          viewOptions: data.viewOptions,
-          colorSchemes: data.colorSchemes,
-          colorItems: data.serialColorItems,
-          locations: data.virtualLocations,
-        })
-      );
+    .then(response => response.json())
+    .then(data =>
+      this.setState({
+        isLoading: false,
+        mapJson: data.geoJson,
+        viewOptions: data.viewOptions,
+        colorSchemes: data.colorSchemes,
+        colorItems: data.serialColorItems,
+        locations: data.virtualLocations,
+      })
+    );
+  };
+
+  fetchMetrics = () => {
+    const { apiMapUri, apiUser, apiPassword } = this.props.options;
+
+    let query = apiMapUri.concat(
+      '/api/Metrics'
+    );
+
+    fetch(query, {
+      mode: 'cors',
+      headers: new Headers({
+        Authorization: 'Basic ' + btoa(apiUser + ':' + apiPassword),
+        'Content-Type': 'application/json',
+      }),
+    })
+    .then(response => response.json())
+    .then(data =>
+      this.setState({
+        metrics: data,
+      })
+    );
   };
 }
 

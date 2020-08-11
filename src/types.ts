@@ -15,6 +15,7 @@ export interface GeoJsonDataState {
   colorItems: ColorItem[];
   locations: VirtualLocation[];
   dynamic: boolean;
+  metrics: Metric[];
 }
 
 export interface Options {
@@ -53,6 +54,11 @@ export interface ColorRange {
 export interface ColorItem {
   serial: string;
   color: string;
+}
+
+export interface Metric {
+  value: number;
+  text: string;
 }
 
 export interface VirtualLocation {

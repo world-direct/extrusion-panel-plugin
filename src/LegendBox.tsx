@@ -1,5 +1,5 @@
 import React, { Component, CSSProperties } from 'react';
-import { Styles, ColorScheme, ColorRange } from './types';
+import { ColorRange, ColorScheme, Styles } from './types';
 
 const classes: Styles = {
   container: {
@@ -7,7 +7,7 @@ const classes: Styles = {
     position: 'absolute',
     bottom: 20,
     right: 0,
-    width: 100,
+    width: 137,
     background: '#fff',
     padding: 4,
     opacity: 0.8,
@@ -21,6 +21,7 @@ const classes: Styles = {
 type Props = {
   classes: Styles;
   colorScheme?: ColorScheme;
+  metric?: string;
 };
 
 type State = {
@@ -59,7 +60,6 @@ export class LegendBox extends Component<Props, State> {
       textShadow: '1px 1px #888',
       boxShadow: '2px 2px #888',
     };
-
     return (
       <p style={colorStyle}>
         {colorRange.fromInclusive !== null ? colorRange.fromInclusive : <span style={classes['infinity']}>&infin;</span>} -{' '}
@@ -70,15 +70,25 @@ export class LegendBox extends Component<Props, State> {
 
   render() {
     const { renderColorRange } = this;
-    const { colorScheme, classes } = this.props;
+    const { colorScheme, metric, classes } = this.props;
+
+    const titleStyle: CSSProperties = {
+      color: '#000',
+      marginBottom: 3,
+      padding: '0 2px',
+    };
 
     return (
       <div id="container" style={classes['container']}>
         {!colorScheme && <p>No color scheme received.</p>}
         {colorScheme &&
-          colorScheme.colorRangeItems.map(c => {
+          <>
+          {metric && <p style={titleStyle}>{metric}</p>}
+          {colorScheme.colorRangeItems.map(c => {
             return renderColorRange(c);
           })}
+          </>
+        }
       </div>
     );
   }

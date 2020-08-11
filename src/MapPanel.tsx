@@ -2,7 +2,7 @@ import React, { CSSProperties } from 'react';
 import ReactMapboxGl, { GeoJSONLayer, Marker, Popup } from 'react-mapbox-gl';
 import { LegendBox } from './LegendBox';
 import { SerialColorBox } from './SerialColorBox';
-import { ColorItem, ColorScheme, ViewOptions, VirtualLocation } from './types';
+import { ColorItem, ColorScheme, Metric, ViewOptions, VirtualLocation } from './types';
 
 const WAIT_INTERVAL = 1000;
 
@@ -66,6 +66,7 @@ type Props = Readonly<{
   flatMap: boolean;
   dynamic: boolean;
   switchColorScheme: () => void;
+  metrics: Metric[];
 }>;
 
 type State = Readonly<{
@@ -83,6 +84,16 @@ class MapPanel extends React.Component<Props, State> {
       maxZoom: 15.5,
       accessToken: this.props.accessToken,
     }),
+  };
+
+  getMetricName = (id?: number): string | undefined => {
+    const { metrics } = this.props;
+
+    if(id === undefined) {
+      return undefined;
+    }
+
+    return metrics.find(m => m.value === id)?.text;
   };
 
   getColorScheme = (): ColorScheme | undefined => {
@@ -117,7 +128,7 @@ class MapPanel extends React.Component<Props, State> {
   };
 
   render() {
-    const { getColorScheme, showMarker, onMouseLeave } = this;
+    const { getColorScheme, showMarker, onMouseLeave, getMetricName } = this;
     const { viewOptions, mapJson, locations, showLocations, flatMap, colorItems, switchColorScheme, metric, dynamic } = this.props;
     const { marker, Map } = this.state;
 
@@ -194,7 +205,7 @@ class MapPanel extends React.Component<Props, State> {
             </Popup>
           )}
         </Map>
-        {flatMap ? <SerialColorBox colorItems={colorItems} /> : <LegendBox colorScheme={getColorScheme()} />}
+        {flatMap ? <SerialColorBox colorItems={colorItems} /> : <LegendBox metric={getMetricName(metric)} colorScheme={getColorScheme()} />}
         {!flatMap && metric === 1 && (
           <div style={toggleContainerStyle}>
             <button onClick={switchColorScheme} style={toggleButtonStyle}>
