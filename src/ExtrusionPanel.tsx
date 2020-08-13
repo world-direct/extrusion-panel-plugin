@@ -209,25 +209,23 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         'Content-Type': 'application/json',
       }),
     })
-    .then(response => response.json())
-    .then(data =>
-      this.setState({
-        isLoading: false,
-        mapJson: data.geoJson,
-        viewOptions: data.viewOptions,
-        colorSchemes: data.colorSchemes,
-        colorItems: data.serialColorItems,
-        locations: data.virtualLocations,
-      })
-    );
+      .then(response => response.json())
+      .then(data =>
+        this.setState({
+          isLoading: false,
+          mapJson: data.geoJson,
+          viewOptions: data.viewOptions,
+          colorSchemes: data.colorSchemes,
+          colorItems: data.serialColorItems,
+          locations: data.virtualLocations,
+        })
+      );
   };
 
   fetchMetrics = () => {
     const { apiMapUri, apiUser, apiPassword } = this.props.options;
 
-    let query = apiMapUri.concat(
-      '/api/Metrics'
-    );
+    let query = apiMapUri.concat('/api/Metrics');
 
     fetch(query, {
       mode: 'cors',
@@ -236,12 +234,12 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
         'Content-Type': 'application/json',
       }),
     })
-    .then(response => response.json())
-    .then(data =>
-      this.setState({
-        metrics: data,
-      })
-    );
+      .then(response => response.json())
+      .then(data =>
+        this.setState({
+          metrics: data,
+        })
+      );
   };
 }
 

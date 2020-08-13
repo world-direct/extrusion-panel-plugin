@@ -81,14 +81,14 @@ export class LegendBox extends Component<Props, State> {
     return (
       <div id="container" style={classes['container']}>
         {!colorScheme && <p>No color scheme received.</p>}
-        {colorScheme &&
+        {colorScheme && (
           <>
-          {metric && <p style={titleStyle}>{metric}</p>}
-          {colorScheme.colorRangeItems.map(c => {
-            return renderColorRange(c);
-          })}
+            {metric && <p style={titleStyle}>{metric}</p>}
+            {colorScheme.colorRangeItems.map(c => {
+              return renderColorRange(c);
+            })}
           </>
-        }
+        )}
       </div>
     );
   }

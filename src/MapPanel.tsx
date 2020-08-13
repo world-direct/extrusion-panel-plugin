@@ -89,7 +89,7 @@ class MapPanel extends React.Component<Props, State> {
   getMetricName = (id?: number): string | undefined => {
     const { metrics } = this.props;
 
-    if(id === undefined) {
+    if (id === undefined) {
       return undefined;
     }
 
