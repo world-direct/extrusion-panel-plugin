@@ -19,6 +19,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "jquery": "^3.5.1",
     "mapbox-gl": "1.10.1",
     "react-mapbox-gl": "4.8.3",
     "ts-build": "^0.2.0"
