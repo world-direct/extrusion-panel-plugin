@@ -16,6 +16,7 @@ export interface GeoJsonDataState {
   locations: VirtualLocation[];
   dynamic: boolean;
   metrics: Metric[];
+  offset: number;
 }
 
 export interface Options {

@@ -180,7 +180,6 @@ class MapPanel extends React.Component<Props, State> {
             fillExtrusionOnMouseMove={showMarker}
             fillExtrusionOnMouseLeave={onMouseLeave}
           />
-
           {showLocations &&
             locations.map(value => (
               <Marker coordinates={[value.longitude, value.latitude]} anchor="bottom">
