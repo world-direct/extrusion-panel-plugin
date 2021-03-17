@@ -1,14 +1,14 @@
 import { AbsoluteTimeRange, PanelProps } from '@grafana/data';
-import { LoadingSpinner } from 'LoadingSpinner';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { PureComponent } from 'react';
 import MapPanel from './MapPanel';
 import { GeoJsonDataState, Options } from './types';
 
-const WAIT_INTERVAL = 2000;
+const WAIT_INTERVAL = 10000;
 
 class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState> {
   timer?: number;
+  offset: number = 0;
 
   readonly state: GeoJsonDataState = {
     isLoading: false,
@@ -19,10 +19,11 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     locations: [],
     dynamic: false,
     metrics: [],
+    offset: 0,
   };
 
   componentDidUpdate(prevProps: PanelProps<Options>, prevState: GeoJsonDataState) {
-    const { triggerChange } = this;
+    const { triggerReload } = this;
 
     if (
       this.props.options.apiMapUri !== prevProps.options.apiMapUri ||
@@ -37,14 +38,14 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     ) {
       clearTimeout(this.timer);
 
-      this.timer = window.setTimeout(triggerChange, WAIT_INTERVAL);
+      triggerReload();
     }
   }
 
   componentDidMount() {
-    const { triggerChange } = this;
+    const { triggerReload } = this;
 
-    triggerChange();
+    triggerReload();
   }
 
   triggerChange = () => {
@@ -52,6 +53,13 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
     getMapData();
   };
+
+  triggerReload = () => {
+    const { triggerReload, getMapData } = this;
+
+    getMapData();
+    this.timer = window.setTimeout(triggerReload, WAIT_INTERVAL);
+  }
 
   onHorizontalRegionSelected = (from: number, to: number) => {
     const newTimeRange: AbsoluteTimeRange = {
@@ -74,7 +82,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     const { isLoading, colorSchemes, colorItems, viewOptions, mapJson, locations, dynamic, metrics } = this.state;
 
     if (isLoading) {
-      return <LoadingSpinner />;
+      //return <LoadingSpinner />;
     }
 
     let metric = null;
@@ -121,7 +129,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
 
   fetchData = () => {
     const { apiMapUri, apiUser, apiPassword, flatMap } = this.props.options;
-    const { dynamic } = this.state;
+    const { dynamic, offset } = this.state;
 
     let metric = null;
     let radius = null;
@@ -165,9 +173,9 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
     let query = apiMapUri.concat(
       '/api/Measurments/map' +
         '?from=' +
-        encodeURIComponent(this.props.timeRange.from.valueOf() + '') +
+        encodeURIComponent((this.props.timeRange.from.valueOf() + (offset * 1000)) + '') +
         '&to=' +
-        encodeURIComponent(this.props.timeRange.to.valueOf() + '')
+        encodeURIComponent((this.props.timeRange.to.valueOf() + (offset * 1000)) + '')
     );
 
     if (metric) {
@@ -218,6 +226,7 @@ class ExtrusionPanel extends PureComponent<PanelProps<Options>, GeoJsonDataState
           colorSchemes: data.colorSchemes,
           colorItems: data.serialColorItems,
           locations: data.virtualLocations,
+          offset: offset + 86400,
         })
       );
   };
